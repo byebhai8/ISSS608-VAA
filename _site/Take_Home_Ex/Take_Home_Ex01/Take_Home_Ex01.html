@@ -184,22 +184,20 @@ ul.task-list li input[type="checkbox"] {
 <col style="width: 35%">
 <col style="width: 60%">
 </colgroup>
-<thead>
-<tr class="header">
-<th>#</th>
-<th>Step</th>
-<th>Screenshot</th>
-</tr>
-</thead>
 <tbody>
 <tr class="odd">
+<td><strong>No.</strong></td>
+<td><strong>Step</strong></td>
+<td><strong>Screenshot</strong></td>
+</tr>
+<tr class="even">
 <td>1</td>
 <td><p>In Tableau Desktop, in the Data Source pane, click on “Text file” (since we are dealing with a csv file and not an excel file).</p>
 <p>When the popup prompts you to choose a file, click on the raw dataset.</p></td>
 <td><p><img src="images/04.png" class="img-fluid"></p>
 <p><img src="images/05.png" class="img-fluid"></p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2</td>
 <td><p>Once the raw dataset is loaded, note that the data source name and field names are not that meaningful. Let’s first change the data source name to: Planning Area - Jun 2022.</p>
 <p>Let’s also change the field names according to the Notes of Dataset file that was in the unzipped folder.</p></td>
@@ -208,14 +206,14 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/08.png" class="img-fluid"></p>
 <p><img src="images/09.png" class="img-fluid"></p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>3</td>
 <td>Once the field names are updated, notice that the field <em>Time</em> is identified to be a numerical field. However, this is supposed to reflect the Year of the record. Hence, let’s change this field’s datatype to Date.</td>
 <td><p><img src="images/10.png" class="img-fluid"></p>
 <p><img src="images/11.png" class="img-fluid"></p>
 <p><img src="images/12.png" class="img-fluid"></p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>4</td>
 <td><p>In our task, we want to plot the male population and female population against their age groups. For this, let’s create two calculated fields to distinguish the populations by gender.</p>
 <p>Create a calculated field for <em>Male Population</em> (where <em>Sex</em> is “Males”).</p>
@@ -224,7 +222,7 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/14.png" class="img-fluid"></p>
 <p><img src="images/15.png" class="img-fluid"></p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>5</td>
 <td><p>Notice that the values in the <em>Age Group</em> field are in bins of 5. Let’s group these values into bins of 15 to simplify our analysis.</p>
 <p>Right click on the <em>Age Group</em> field and click on “Create Group…”.</p>
@@ -232,7 +230,7 @@ ul.task-list li input[type="checkbox"] {
 <td><p><img src="images/46.png" class="img-fluid"></p>
 <p><img src="images/47.png" class="img-fluid"></p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>6</td>
 <td><p>In our task, it is stated that we only show 9 planning areas in a view. So, to reduce the size of the data that we load, let’s filter the data source to only keep 9 planning areas in the data. Click on “Add” to add a new data source filter.</p>
 <p>In the Data Source Filters popup, click on “Add” to add a new filter for the <em>Planning Area</em> field.</p>
@@ -246,7 +244,7 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/20.png" class="img-fluid"></p>
 <p><img src="images/21.png" class="img-fluid"></p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>7</td>
 <td><p>Now, let’s build the visualization in “Sheet 1”. To set the base for our visualization, which is going to be a 3x3 matrix, let’s create two calculated fields; one for columns and one for rows.</p>
 <p>Drag <em>Columns</em> and <em>Rows</em> fields to the Column and Row panes respectively.</p>
@@ -259,12 +257,12 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/51.png" class="img-fluid"></p>
 <p><img src="images/52.png" class="img-fluid"></p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>8</td>
 <td>Now, let’s drag the two calculated fields we created (<em>Male Population</em> &amp; <em>Female Population</em>) to the Columns pane and the <em>Age Group (Group)</em> field to the Rows pane. Notice now that we have two bar charts - one for male population and one for female population, for each age group in our dataset.</td>
 <td><img src="images/53.png" class="img-fluid"></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>9</td>
 <td><p>Let’s convert our bar charts for the genders into a pyramid-like view by editing the axis for the <em>Male Population</em> field. Right click on the axis for <em>Male Population</em> field and select “Edit Axis”.</p>
 <p>In the popup, under the section “Scale”, tick the check-box for “Reversed” to reverse the axis for the <em>Male Population</em> field. Now, if you close this popup, you will notice that the divider between the two bar charts indicates that the axis starts from 0K.</p></td>
@@ -272,12 +270,12 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/55.png" class="img-fluid"></p>
 <p><img src="images/56.png" class="img-fluid"></p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>10</td>
 <td>Now that we have a pyramid-like view for the age-sex breakdown, let’s bring in the planning area information by dragging the field <em>Planning Area</em> into the Details section of the All marks card.</td>
 <td><img src="images/57.png" class="img-fluid"></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>11</td>
 <td><p>Let’s update how the calculated fields <em>Columns</em> and <em>Rows</em> are computed - which should be based on the <em>Planning Area</em> field.</p>
 <p>Notice now that the view has been updated to a 3x3 matrix.</p></td>
@@ -285,7 +283,7 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/59.png" class="img-fluid"></p>
 <p><img src="images/60.png" class="img-fluid"></p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>12</td>
 <td><p>To distinguish between the two genders in our view, let’s color the bars accordingly.</p>
 <p>In the marks card for <em>Male Population</em> field, change the color to teal.</p>
@@ -295,33 +293,34 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/27.png" class="img-fluid"></p>
 <p><img src="images/61.png" class="img-fluid"></p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>13</td>
 <td><p>Now, let’s do some formatting to the view starting with how the view is displayed.</p>
 <p>Let’s change the view from”Standard” to “Entire View” to spread out our display.</p></td>
 <td><img src="images/62.png" class="img-fluid"></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>14</td>
 <td><p>Now we can view the full chart in the view. However, it still looks cluttered. Let’s remove the axis headers for both <em>Male Population</em> and <em>Female Population</em> fields.</p>
 <p>Right click on the axis header and un-check “Show Header” for either of the axis. This will remove the axis header in our chart.</p>
-<p>Let’s also remove the header for the <em>Row</em> and <em>Columns</em> fields. Un-check “Show Header” for both these fields.</p></td>
+<p>Let’s also remove the header for the <em>Columns</em> and <em>Rows</em> fields. Un-check “Show Header” for both these fields.</p></td>
 <td><p><img src="images/31.png" class="img-fluid"></p>
 <p><img src="images/63.png" class="img-fluid"></p>
 <p><img src="images/64.png" class="img-fluid"></p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>15</td>
 <td>Let’s format the bars in the view now. Under the marks card for All, drag the slider to reduce the size of the bars till the recommended size (indicated by a pipe).</td>
 <td><img src="images/33.png" class="img-fluid"></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>16</td>
 <td><p>Notice that there are many grid lines in our chart which makes the view cluttered. To format grid line, right click on the view and select the “Format” option.</p>
-<p>In the format panel, click on the icon for grid lines. Under the tab “Columns”, set Grid Lines to None. Notice now that the view looks much cleaner.</p></td>
-<td><img src="images/34.png" class="img-fluid"><img src="images/35.png" class="img-fluid"></td>
+<p>In the format panel, click on the icon for grid lines. Under the tab “Columns”, set Grid Lines to None.</p></td>
+<td><p><img src="images/34.png" class="img-fluid"></p>
+<p><img src="images/35.png" class="img-fluid"></p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>17</td>
 <td><p>Let’s include the text labels by including the relevant fields in the label section of the marks card.</p>
 <p>For the male population marks card, let’s drag the <em>SUM(Male Population)</em> field to the label section. To format this text label, right click on the <em>SUM(Male Population</em>) field in the marks card and click on “Format”.</p>
@@ -331,29 +330,31 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/39.png" class="img-fluid"></p>
 <p><img src="images/40.png" class="img-fluid"></p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>18</td>
-<td><p>Notice that the y-axis, <em>Age Group (Group)</em> field is sorted by default.</p>
-<p>Let’s switch this to sort by descending order so that we can view the age group starting from the youngest age to the oldest age. Right click on <em>Age Group (Group)</em> field in the Rows pane and select “Sort”.</p>
+<td><p>Notice that the y-axis, <em>Age Group (Group)</em> field is sorted by default. Let’s switch this to sort by descending order so that we can view the age group starting from the youngest age to the oldest age.</p>
+<p>Right click on <em>Age Group (Group)</em> field in the Rows pane and select “Sort”.</p>
 <p>In the popup, change the sort order to “Descending”.</p></td>
 <td><p><img src="images/66.png" class="img-fluid"></p>
 <p><img src="images/42.png" class="img-fluid"></p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>19</td>
-<td><p>Let’s also sort the x-axis, <em>Planning Area</em> field to be in descending order based on the sum of population. To do this, let’s right click the <em>Planning Area</em> field in the All marks card and select “Sort”.</p>
-<p>For the <em>Planning Area</em> field, let’s sort by Sum of Population in descending order.</p></td>
+<td><p>Let’s also sort the x-axis, <em>Planning Area</em> field to be in descending order based on the sum of population.</p>
+<p>To do this, let’s right click the <em>Planning Area</em> field in the All marks card and select “Sort”.</p>
+<p>For the <em>Planning Area</em> field, let’s sort by Sum of Population in Descending Order.</p></td>
 <td><p><img src="images/67.png" class="img-fluid"></p>
 <p><img src="images/44.png" class="img-fluid"></p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>20</td>
-<td><p>Now, we have our 3x3 matrix of male and female population by their age groups in the top 9 planning areas by population. However, at one glance, we can’t say what are these top 9 planning areas. To bring the <em>Planning Area</em> field as a text label for this view, let’s create a dummy calculated field called <em>dummy</em>.</p>
+<td><p>Now, we have our 3x3 matrix of male and female population by their age groups in the top 9 planning areas by population. However, at one glance, we can’t say what are these top 9 planning areas.</p>
+<p>To bring the <em>Planning Area</em> field as a text label for this view, let’s create a dummy calculated field called <em>dummy</em>.</p>
 <p>This <em>dummy</em> field is being assigned the value of 40K for the age group of “90 and above”. The reason we choose this age group is because we want our text label to be shown on the same row as this age group value in our trellis chart. As for the value of 40K, I chose this because it is higher than those values in our trellis chart.</p></td>
 <td><p><img src="images/68.png" class="img-fluid"></p>
 <p><img src="images/69.png" class="img-fluid"></p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>21</td>
 <td><p>Bring this new calculated field, <em>dummy</em>, into the view on the Columns panel. Ensure that the <em>dummy</em> field is taking the AVG and not the SUM.</p>
 <p>Make this <em>dummy</em> field a dual axis with the <em>Female Population</em> field.</p>
@@ -362,14 +363,14 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/70.png" class="img-fluid"></p>
 <p><img src="images/71.png" class="img-fluid"></p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>22</td>
 <td><p>Now, let’s format this <em>dummy</em> field. We do not want any axis headers so let’s remove that first by un-checking “Show Header” after we right click on the <em>dummy</em> field’s axis header.</p>
 <p>Let’s also un-check “Show Header” for the <em>Female Population</em> field.</p></td>
 <td><p><img src="images/73.png" class="img-fluid"></p>
 <p><img src="images/86.png" class="img-fluid"></p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>23</td>
 <td>We also do not want any colored bars to be shown for the dummy field. Let’s remove the <em>measure names</em> field from the colors section in the marks card for both the <em>dummy</em> field and <em>Female Population</em> fields.</td>
 <td><p><img src="images/74.png" class="img-fluid"></p>
@@ -377,27 +378,27 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="images/76.png" class="img-fluid"></p>
 <p><img src="images/77.png" class="img-fluid"></p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>24</td>
 <td>Let’s also reduce the size of the bars for the <em>dummy</em> field to the smallest possible size.</td>
 <td><img src="images/78.png" class="img-fluid"></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>25</td>
 <td>We shall also make the <em>dummy</em> field’s color to be completely opaque with no borders.</td>
 <td><img src="images/79.png" class="img-fluid"></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>26</td>
-<td><p>Before adding the <em>Planning Area</em> field to the text section in the marks card for the <em>dummy</em> field, let’s also change the type or mark from “Bar” into “Circle”.</p>
+<td><p>Before adding the <em>Planning Area</em> field to the text section in the marks card for the <em>dummy</em> field, let’s also change the type of mark from “Bar” into “Circle”.</p>
 <p>Then, drag the <em>Planning Area</em> field into the text section in the marks card.</p></td>
 <td><p><img src="images/81.png" class="img-fluid"></p>
 <p><img src="images/82.png" class="img-fluid"></p>
 <p><img src="images/83.png" class="img-fluid"></p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>27</td>
-<td><p>Let’s format the text label to be bigger, bold, as well as center-aligned.</p>
+<td><p>Let’s format the text label to be bigger and bold, as well as center-aligned.</p>
 <p>Now we have a clean and insightful view that is ready for analysis!</p></td>
 <td><p><img src="images/84.png" class="img-fluid"></p>
 <p><img src="images/85.png" class="img-fluid"></p>
@@ -408,14 +409,31 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="discussion-of-analysis" class="level3">
 <h3 class="anchored" data-anchor-id="discussion-of-analysis">Discussion of Analysis</h3>
-<p>The following section elaborates on the patterns revealed by the analytical visualization that was built using Tableau Desktop.</p>
-<p>Here are the key points that we will be discussing:</p>
-<ol type="1">
-<li>Top 10 Planning Areas</li>
-<li>xx</li>
-<li>zz</li>
-</ol>
-<p>This concludes the work submitted for Take-Home Exercise 1. Thank you.</p>
+<p>The following section elaborates on the patterns revealed by the analytical visualization that was built.</p>
+<p>So, what can we learn from this visualization that we built in Tableau Desktop?</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/Top 9 Planning Areas Dashboard.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+<p>Firstly, when we look at the Top 9 Planning Areas, namely Bedok, Tampines, Jurong West, Sengkang, Woodlands, Hougang, Yishun, Chua Chu Kang and Punggol, there is one thing that is common. They are all HDB Residential Areas! So, there is no surprise that these are the Top 9 Planning Areas based on the total population in these areas.</p>
+<p>Let us now analyse this view by the Age Groups. Across the Planning Areas, a key thing to note would be that Bedok is the only area which has at least 1K population for both Males and Females who are above the age of 90. Moreover, they also have the highest population of both Males and Females who are between the ages of 75 and 89. From this, we can deduce that Bedok hosts one of the largest populations of elderly who are above the age of 75.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/88.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+<p>If we look at the opposite spectrum in the Age Group, both Sengkang and Punggol seem to have the largest population of Males and Females between the ages of 0 to 14. This could indicate that these Planning Areas are most likely to host younger families who are raising children and adolescents.</p>
+<p>Another thing to note would be that 3 out of these 9 Planning Areas, namely Bedok, Tampines and Hougang, have a similar sum of population in the age groups of 45 to 59 and 60 to 74. This could be an indicator that in the future, these areas will host a larger group of elderly above the age of 60.</p>
+<p>Likewise, there are only 2 out of these 9 Planning Areas, namely Sengkang and Punggol, which have a higher population in the age group of 0 to 14 as when compared to the age group of 15 to 29. Meaning they have more people below the age of 14 than in the ages between 15 to 29. Whereas, for the other 7 Planning Areas, this is the opposite.</p>
+<p>When looking at Age Groups and Planning Areas, one section that draws my eye would be the Planning Area of Punggol. This is because it is notable that the population between the ages of 30 to 44 is almost the double of the population between the ages of 15 to 29. This is something that we could further analyse as a future work.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/89.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+<p>Moving on to the breakdown by Gender, can we determine from this visualization whether we have more Males than Females? In my opinion, the answer would be no as this visualization does not intend to answer that question. However, with this visualization, for example, we can determine that there are more Males than Females in the ages between 0 to 14 across all the Top 9 Planning Areas. On the other hand, there are more Females than Males in the ages between 30 to 44 across all the Top 9 Planning Areas.</p>
+<p>This concludes the work submitted for Take-Home Exercise 1. Thank you!</p>
 
 
 </section>
