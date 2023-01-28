@@ -1,0 +1,58 @@
+---
+title: "Take-Home Exercise 2"
+description: "Creating data visualisation beyond default"
+author: "Bhairavi"
+date: "`r Sys.Date()`"
+---
+
+The following is my submission for Take-Home Exercise 2.
+
+## 1. Overview
+
+This take-home exercise is based on a submission done by a classmate in Take-Home Exercise 1. The aim of this exercise is to critique the visualization prepared by that classmate in terms of clarity and aesthetics. On top of that, an alternative design of the original visualization will be done using the data visualization design principles.
+
+## 2. Dataset
+
+The dataset used in this take-home exercise was downloaded from the following link, below the sub-section of Population Trends: <https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data>
+
+We are using the Singapore Residents by Planning Area / Subzone, Age Group, Sex and Floor Area of Residence, June 2022.csv for this exercise.
+
+## 3. Visualization Critique
+
+### 3.1 Original Design
+
+xxx
+
+### 3.2 Critique
+
+##### 3.2.1 Clarity
+
+xxx
+
+##### 3.2.2 Aesthetics
+
+xxx
+
+## 4. Alternative Design
+
+### 4.1 Sketch
+
+xxx
+
+### 4.2 Remake
+
+xxx
+
+##### 4.2.1 Clarity
+
+xxx
+
+##### 4.2.2 Aesthetics
+
+xxx
+
+## 5. Learning Points
+
+xxx
+
+This concludes the work submitted for Take-Home Exercise 2. Thank you!
