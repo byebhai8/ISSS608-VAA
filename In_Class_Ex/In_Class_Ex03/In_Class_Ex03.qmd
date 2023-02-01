@@ -35,6 +35,8 @@ ggplot(data = exam_data,
 With interactivity:
 
 ```{r}
+tooltip_css <- "background-color:white; font-style:bold; color:black;"
+
 p <- ggplot(data = exam_data,
             aes(x = MATHS)) +
   geom_dotplot_interactive(aes(tooltip = ID),
@@ -46,5 +48,6 @@ p <- ggplot(data = exam_data,
 
 girafe(ggobj = p,
        width_svg = 6,
-       height_svg = 6*0.618)
+       height_svg = 6*0.618,
+       options = list(opts_tooltip(css = tooltip_css)))
 ```

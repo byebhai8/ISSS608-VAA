@@ -1,58 +1,209 @@
 ---
 title: "Take-Home Exercise 2"
-description: "Creating data visualisation beyond default"
 author: "Bhairavi"
-date: "`r Sys.Date()`"
+date: 01 February 2023
+execute:
+  warning: false
+format: html
+editor: visual
 ---
 
 The following is my submission for Take-Home Exercise 2.
 
 ## 1. Overview
 
-This take-home exercise is based on a submission done by a classmate in Take-Home Exercise 1. The aim of this exercise is to critique the visualization prepared by that classmate in terms of clarity and aesthetics. On top of that, an alternative design of the original visualization will be done using the data visualization design principles.
+This take-home exercise is based on a submission done by a classmate for Take-Home Exercise 1. The aim of this exercise is to critique the visualization prepared by that classmate in terms of clarity and aesthetics. On top of that, an alternative design of the original visualization will be done using the data visualization design principles.
 
 ## 2. Dataset
+
+### 2.1 Data Source
 
 The dataset used in this take-home exercise was downloaded from the following link, below the sub-section of Population Trends: <https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data>
 
 We are using the Singapore Residents by Planning Area / Subzone, Age Group, Sex and Floor Area of Residence, June 2022.csv for this exercise.
 
+![](images/01.png){fig-align="center"}
+
+### 2.2 Data Preparation
+
+Data preparation steps that were done by the classmate of the visualization that we will be critiquing is as follows.
+
+Load libraries and dataset:
+
+```{r}
+#| code-fold: true
+
+pacman::p_load(ggplot2, ggiraph, dplyr, tidyverse)
+
+pa_data <- read_csv("respopagesexfa2022.csv") 
+```
+
+Get Top 9 Planning Areas by Population:
+
+```{r}
+#| code-fold: true
+
+# Total population count by planning area
+pop <- pa_data %>%
+  group_by(PA) %>%
+  summarize(totalPop = sum(Pop))
+
+# Sort planning areas by population
+pop_sorted <- pop[order(pop$totalPop, decreasing = TRUE), ]
+
+# Get top 9 planning areas by population
+pop_filtered <- head(pop_sorted, 9)
+pop_filtered$index <- 1:nrow(pop_filtered)
+
+# Filter raw dataset to keep the top 9 planning areas by population
+pa_filtered <- subset(pa_data, PA %in% pop_filtered$PA)
+```
+
+Sort dataset by Top 9 Planning Areas and Age Group:
+
+```{r}
+#| code-fold: true
+
+# Group dataset by planning areas, age group and sex
+pa_grouped <- aggregate(Pop ~ PA + AG + Sex, data = pa_filtered, FUN = sum)
+
+# Sort dataset by top 9 planning areas and age group
+ordered <- c("0_to_4", "5_to_9", "10_to_14", "15_to_19", "20_to_24", "25_to_29", "30_to_34", "35_to_39", "40_to_44", "45_to_49", "50_to_54", "55_to_59", "60_to_64", "65_to_69", "70_to_74", "75_to_79", "80_to_84", "85_to_89", "90_and_over")
+pa_final <- pa_grouped %>%
+  mutate(PA = factor(PA, levels = pop_filtered$PA)) %>%
+  mutate(AG = factor(AG, levels = ordered)) %>%
+  arrange(PA, AG)
+```
+
 ## 3. Visualization Critique
 
 ### 3.1 Original Design
 
-xxx
+The original design is shown below:
+
+![](images/original.png){fig-align="center"}
+
+This visualization, a faceted bar chart, plots Singapore's Top 9 Planning Areas by Population Count, whereby the age-sex pyramid is coloured by gender for each of the different age groups.
 
 ### 3.2 Critique
 
 ##### 3.2.1 Clarity
 
-xxx
+-   Display of Data Labels
+
+There are text labels for the bars in the age-sex pyramid and this makes the visualization cluttered. Besides, these text labels will draw the user's attention away from the shape of the age-sex pyramid. Moreover, the text labels are not shown for every bar in the visualization, which could lead to assumptions and confusion as to why only certain values are being shown.
+
+-   Alignment of Totals
+
+The labels for the totals, such as "Hougang 623,660" and "Sengkang 720,530" are positioned in a confusing manner as they seem to be in the wrong grids in the visual, and this might be misleading as users might interpret the grids in the visualization incorrectly. Another thing to note would be that these total values seem to be incorrect upon data validation, and this could confuse users as well.
+
+-   Legends
+
+It might be easy to overlook the colour-coded text in the subtitle of this chart, however this subtitle seems to represent the legends of this visualization - Blue for Male and Pink for Female. Since it is not explicitly stated, the users may misinterpret the sex assigned to the colour-coded bars in this visualization.
 
 ##### 3.2.2 Aesthetics
 
-xxx
+-   Colours
+
+The colours chosen to indicate the two different genders in this visualization are clear and distinguishable. However, the addition of legends to indicate the values assigned to these colours would be beneficial for users.
+
+-   X-Axis Title & Labels
+
+This visualization does not show the x-axis title and labels. It would be easier to read and interpret the visualization if the x-axis indicated that it is referring to the population count.
+
+-   Captions
+
+Including a caption to mention the data source for this visualization will be helpful for users as well.
 
 ## 4. Alternative Design
 
 ### 4.1 Sketch
 
-xxx
+![](images/sketch.jpg){fig-align="center"}
+
+In the alternative design, as per the sketch shown above, the proposal is to include the rank and total population count of each of the top 9 planning areas in the grid view, as well as the inclusion of graphical elements such as caption, legend and x-axis labels.
 
 ### 4.2 Remake
 
-xxx
+```{r}
+#| code-fold: true
+#| fig-height: 12
+#| fig-width: 12
+
+# Labels to be shown in the header
+label <- function(string) {
+  label <- paste0(pop_filtered$index, 
+                  '. ', 
+                  string, 
+                  ' (Pop = ', 
+                  format(pop_filtered$totalPop, 
+                         big.mark = ",", 
+                         scientific = FALSE), ')')
+  label
+}
+
+ageSexPyramid <- ggplot(pa_final,
+                        aes(x = ifelse(Sex == "Males",
+                                       yes = -Pop, 
+                                       no = Pop),
+                            y = AG,
+                            fill = Sex)) +
+  geom_col_interactive(width = 0.5,
+                       aes(tooltip = paste0("Pop for ", Sex, ": ", Pop))) +
+  facet_wrap(~ PA, labeller = labeller(PA = label)) +
+  theme_bw() +
+  scale_fill_manual(values = c("Males" = "lightblue", 
+                               "Females" = "lightpink")) +
+  labs(x = "Population",
+       y = "Age Group",
+       title = "Singapore's Constrictive Age-Sex Pyramid",
+       subtitle = "Top 9 Planning Areas by Population, 2022",
+       caption = "Data Source: https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data") +
+  guides(fill = guide_legend(direction = "horizontal")) +
+  theme(plot.title = element_text(hjust = 0.5,
+                                  size = 18),
+        plot.subtitle = element_text(hjust = 0.5,
+                                     size = 12),
+        plot.caption = element_text(hjust = 0),
+        legend.position = c(1, 1.05),
+        legend.justification = "right")
+
+fig <- girafe(ggobj = ageSexPyramid)
+fig
+```
+
+This makeover graph retains the good features of the original graph. This includes the overall format as well as graphical elements such as title, subtitle and grid lines. The colour scheme for the bar charts are also retained as it is clear and distinguishable.
 
 ##### 4.2.1 Clarity
 
-xxx
+-   Data Labels in Tooltips
+
+To be clear and consistent in the display of data labels, they have been placed in the tooltips for each of the bars in the visualization. Moreover, this display declutters the view and does not draw the user's attention away from the shape of the age-sex pyramid.
+
+-   Alignment of Totals
+
+The labels for the totals have now been placed clearly at the header section of each grid, while also indicating the rank of the planning area in the Top 9. For example, it is clear that Bedok is the number one planning area with a population total of 278,870.
+
+-   Legends
+
+In the remake, it is explicitly indicated that the colour-coded bars are based on the field Sex, as shown in the legends in the top-right corner of this visualization.
 
 ##### 4.2.2 Aesthetics
 
-xxx
+-   Colours
+
+The colours chosen to indicate the two different genders in this visualization are clear and distinguishable. With the addition of well-placed legends, it is also explicit and avoids the case of misinterpretations.
+
+-   X-Axis Title & Labels
+
+With the aid of the newly added x-axis title and labels, it makes it easier for users to read and interpret this visualization.
+
+-   Caption
+
+The caption to mention the data source for this visualization has also been included at the bottom in a clean manner.
 
 ## 5. Learning Points
 
-xxx
+This take-home exercise has helped me realize the different ways I could have worked on take-home exercise 01. By analyzing and exploring my classmates' works, I have gathered more ideas that would definitely come in handy in my future work. Moreover, I managed to explore ggplot2 with the hands-on practice of creating this visualization, and have learned how we can use ggiraph to create interactive plots as well.
 
 This concludes the work submitted for Take-Home Exercise 2. Thank you!

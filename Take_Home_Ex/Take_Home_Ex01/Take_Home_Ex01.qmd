@@ -1,7 +1,7 @@
 ---
 title: "Take-Home Exercise 1"
 author: "Bhairavi"
-date: "`r Sys.Date()`"
+date: 22 January 2023
 ---
 
 The following is my submission for Take-Home Exercise 1.

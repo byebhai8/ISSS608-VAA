@@ -28,7 +28,7 @@ website:
 
 format:
   html:
-    theme: darkly
+    theme: zephyr
     css: styles.css
     toc: true
 
