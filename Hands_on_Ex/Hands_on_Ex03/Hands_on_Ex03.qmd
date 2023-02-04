@@ -1,0 +1,36 @@
+---
+title: "Hands-On Exercise 3: Programming Interactive Data Visualization with R"
+author: "Bhairavi"
+date: "4 February 2023"
+---
+
+## Getting Started
+
+The code chunk below installs and launches the following R packages.
+
+```{r}
+pacman::p_load(ggiraph, plotly, gganimate, DT, tidyverse, patchwork)
+```
+
+## Importing Data
+
+The code chunk below will read the Exam_data.csv file.
+
+```{r}
+exam_data <- read_csv("data/Exam_data.csv")
+```
+
+## Interactive Data Visualization
+
+### ggiraph methods
+
+ggiraph is a htmlwidget and a ggplot2 extension. It allows ggplot graphics to be interactive. This interactivity is made with ggplot geometries that can take in three arguments:
+
+- tooltip: a column of datasets that contain tooltips to be displayed when the mouse if over elements
+- onclick: a column of datasets that contain a JavaScript function to be executed when elements are clicked
+- data_id: a column of datasets that contain an id to be associated with elements
+
+When used within a R shiny application, elements associated with an id (data_id) can be selected and manipulated on client and server sides.
+
+#### Tooltip Effects
+
