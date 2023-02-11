@@ -1,0 +1,202 @@
+---
+title: "In_Class_Ex05"
+author: "Bhairavi"
+date: "11 February 2023"
+---
+
+The following code chunk will install the necessary R packages.
+
+```{r}
+pacman::p_load(corrplot, tidyverse, ggstatsplot, plotly, seriation, dendextend, heatmaply, GGally, parallelPlot)
+```
+
+ggtern is commented off in this exercise.
+
+The code chunk below will import the dataset.
+
+```{r}
+wine <- read_csv("data/wine_quality.csv")
+```
+
+The code chunk below will plot a scatter plot matrix of Wine Quality Data. This will be a 11 by 11 matrix.
+
+```{r}
+pairs(wine[,1:11])
+```
+
+We can use ggcorrmat() to visualize a correlation matrix as it can provide a comprehensive and professional statistical report.
+
+The code chunk below plots a correlation matrix using ggcorrmat().
+
+```{r}
+ggstatsplot::ggcorrmat(data = wine,
+                       cor.vars = 1:11)
+```
+
+The code chunk below customizes the correlation matrix.
+
+```{r}
+ggstatsplot::ggcorrmat(data = wine,
+                      cor.vars = 1:11,
+                      ggccorrplot.args = list(outline.color = "black",
+                                              hc.order = TRUE,
+                                              tl.cex = 10),
+                      title = "Correlogram for wine dataset",
+                      subtitle = "Four pairs are no significant at p < 0.05")
+```
+
+In the code chunk below, the cor() of R Stats will be used to compute the correlation matrix of the wine data frame.
+
+```{r}
+wine.cor <- cor(wine[,1:11])
+```
+
+Next, corrplot() will be used to plot the corrgram by using the default settings.
+
+```{r}
+corrplot(wine.cor)
+```
+
+We can change the default setting using the method argument:
+
+```{r}
+corrplot(wine.cor,
+         method = "ellipse")
+```
+
+We can also design the corrgram to have a mixed visual matrix to display one half as an ellipse and another half as a number.
+
+```{r}
+corrplot.mixed(wine.cor,
+               lower = "ellipse",
+               upper = "number",
+               tl.pos = "lt",
+               diag = "l",
+               tl.col = "black")
+```
+
+We can also draw rectangles around the corrgram based on the results of the hierarchical clustering. 
+
+```{r}
+corrplot(wine.cor,
+         method = "ellipse",
+         tl.pos = "lt",
+         tl.cos = "black",
+         order = "hclust",
+         hclust.method = "ward.D",
+         addrect = 3)
+```
+
+We will now be importing the data as part of the hands-on exercise for building a ternary plot with R.
+
+```{r}
+pop_data <- read_csv("data/respopagsex2000to2018_tidy.csv")
+```
+
+The following code chunk uses the mutate() function of dplyr package to derive three new measures, namely Young, Active and Old.
+
+```{r}
+agpop_mutated <- pop_data %>%
+  mutate('Year' = as.character(Year)) %>%
+  spread(AG, Population) %>%
+  mutate(YOUNG = rowSums(.[4:8])) %>%
+  mutate(ACTIVE = rowSums(.[9:16])) %>%
+  mutate(OLD = rowSums(.[17:21])) %>%
+  mutate(TOTAL = rowSums(.[22:24])) %>%
+  filter(Year == 2018) %>%
+  filter(TOTAL > 0) %>%
+  select(PA, SZ, YOUNG, ACTIVE, OLD, TOTAL)
+```
+
+We will now use the ggtern() function of ggtern package to create a simple ternary plot. -->
+
+The code chunk below has been written in plain text due to the issue with ggtern.
+
+ggtern(data = agpop_mutated,
+       aes(x = YOUNG,
+           y = ACTIVE,
+           z = OLD)) +
+  geom_point()
+
+We can also customize this plot:
+
+ggtern(data = agpop_mutated,
+       aes(x = YOUNG,
+           y = ACTIVE,
+           z = OLD)) +
+  geom_point() +
+  labs(title = "Population Structure, 2015") +
+  theme_rgbw()
+
+We will now be importing the data as part of the hands-on exercise for building a heatmap in R.
+
+```{r}
+wh <- read_csv("data/WHData-2018.csv")
+```
+
+The following code chunk will change the rows by country name instead of row number.
+
+```{r}
+row.names(wh) <- wh$Country
+```
+
+We will now load the data into a data frame and create a data matrix.
+
+```{r}
+wh1 <- dplyr::select(wh, c(3, 7:12))
+wh_matrix <- data.matrix(wh)
+```
+
+The following code chunk will create the heatmap using heatmap() of Base Stats.
+
+```{r}
+wh_heatmap <- heatmap(wh_matrix,
+                      Rowv = NA,
+                      Colv = NA)
+```
+
+The following code chunk uses the Blues colour palette of rColorBrewer:
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
+          seriate = "none",
+          colors = Blues)
+```
+
+We can include additional arguments to ensure that a cartographic quality heatmap can be produced.
+
+```{r}
+heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
+          Colv = NA,
+          seriate = "none",
+          colors = Blues,
+          k_row = 5,
+          margins = c(NA,200,60,NA),
+          fontsize_row = 4,
+          fontsize_col = 5,
+          main = "World Happiness Score and Variables by Country, 2018 \nDataTransformation using Normalise Method",
+          xlab = "World Happiness Indicators",
+          ylab = "World Countries")
+```
+
+We will now be importing the data as part of the hands-on exercise for building a heatmap in R.
+
+```{r}
+whNew <- read_csv("data/WHData-2018.csv")
+```
+
+We can use ggparcoord() to plot a basic static parallel coordinates plot.
+
+```{r}
+ggparcoord(data = whNew,
+           columns = c(7:12))
+```
+
+We can use the code chunk below to plot an interactive parallel coordinates plot using parallelPlot().
+
+```{r}
+histoVisibility <- rep(TRUE, ncol(wh))
+parallelPlot(wh,
+             rotateTitle = TRUE,
+             histoVisibility = histoVisibility)
+```
