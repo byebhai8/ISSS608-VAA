@@ -31,7 +31,7 @@ We are using the Resale flat prices based on registration date from Jan-2017 onw
 First, let's load the dataset and the libraries that we will be using:
 
 ```{r}
-pacman::p_load(tidyverse, lubridate)
+pacman::p_load(tidyverse, lubridate, plotly, treemap, ggstatsplot)
 rawData <- read_csv("resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
 ```
 
@@ -42,13 +42,13 @@ head(rawData)
 summary(rawData)
 ```
 
-As you can see, the month column is in the format of YYYY-MM. Using the month column, we can actually create three new columns - Month, Quarter and Year, which would be useful when building visualizations.
+As you can see, the month column is in the format of YYYY-MM. Using the month column, we can actually create two new columns - Date (in YYYY-MM-DD format) and Year. These fields will be useful when building visualizations.
 
 ```{r}
 data <- rawData %>%
-  mutate(Month = month(ym(month))) %>%
-  mutate(Quarter = quarter(ym(month))) %>%
-  mutate(Year = year(ym(month)))
+  mutate(Year = year(ym(month))) %>%
+  mutate(Date = as.Date(paste(month, "-01", sep = ""),
+                        format = "%Y - %m - %d"))
 summary(data)
 ```
 
@@ -61,8 +61,226 @@ resaleFlats <- data %>%
 head(resaleFlats)
 ```
 
-The data is now ready for exploration and visualization.
+The data is now ready for visualization.
 
-## 2.3 Data Exploration
+# 3. Data Exploration & Visualizations
+
+Let's first explore the fields we have in our dataset, such as the unique values we have in our key categorical variables - Town, Flat Types and Flat Models.
+
+```{r}
+unique(resaleFlats$town)
+unique(resaleFlats$flat_type)
+unique(resaleFlats$flat_model)
+```
+
+For this exercise, we will focus on the following areas:
+
+1. Resale Flats by Flat Models
+2. Resale Flats by Flat Types
+3. Resale Prices by Flat Models
+4. Resale Prices by Flat Types
+5. Resale Prices vs Floor Area
+6. Resale Prices vs Floor Area by Month
+
+### 3.1 Resale Flats by Flat Models
+
+The code chunk below aims to explore the number of resale flats by flat models.
+
+```{r}
+#| code-fold: true
+#| fig-width: 12
+#| fig-height: 12
+
+fig3 <- ggplot(data = resaleFlats,
+               aes(x = flat_type,
+                   fill = flat_type,
+                   colour = flat_type)) +
+  geom_bar(width = 0.5) +
+  facet_wrap(~ flat_model) +
+  labs(title = "Trend of Flat Models by Flat Types in Singapore Towns, 2022") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+ggplotly(fig3)
+```
+
+Based on the figure above, it is clear that certain flat models are more common that the others, and these common flat models are either Improved, Model A or New Generation. Another reason as to why the other flat models do not seem to have much data could be because we already filtered the dataset to only focus on 3 Room, 4 Room and 5 Room flats.
+
+### 3.2 Resale Flats by Flat Types
+
+The following code chunk aims to explore the number of resale flats by flat type for the various towns in Singapore.
+
+```{r}
+#| code-fold: true
+#| fig-width: 12
+#| fig-height: 12
+
+fig1 <- ggplot(data = resaleFlats,
+               aes(x = flat_type,
+                   fill = flat_type,
+                   colour = flat_type)) +
+  geom_bar(width = 0.5) +
+  facet_wrap(~ town) +
+  labs(title = "Trend of Flat Types in Singapore Towns, 2022") + 
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+ggplotly(fig1)
+```
+
+Based on the interactive plot above, we can deduce that Jurong East, Jurong West and Serangoon do not seem to have many resale flats in their towns. On the other hand, Punggol, Sengkang, Woodlands and Yishun seems to have a higher number of resale flats in their towns.
+
+Let's narrow down our data exploration by grouping the towns based on their average resale prices. The code chunk below groups the dataset by date, towns and their flat types and computes the average resale price for this grouping.
+
+```{r}
+#| code-fold: true
+
+groupedFlats <- resaleFlats %>%
+  group_by(Date, town, flat_type) %>%
+  summarise(avgPrice = mean(resale_price)) %>%
+  ungroup()
+
+groupedTowns <- resaleFlats %>%
+  group_by(Date, town, flat_type) %>%
+  summarise(avgPrice = mean(resale_price))
+```
+
+Another way to visualize the number of resale flats by flat type would be to plot a treemap. This treemap will allow us to gain quick insights into which town has a higher contribution to each flat type.
+
+```{r}
+#| code-fold: true
+#| fig-width: 12
+#| fig-height: 8
+
+level1 <- groupedTowns$flat_type
+level2 <- groupedTowns$town
+avgPrice <- groupedTowns$avgPrice
+data <- data.frame(level1, level2, avgPrice)
+
+treemap(data,
+        index = c("level1", "level2"),
+        vSize = c("avgPrice"),
+        type = "index",
+        palette = "Set2")
+```
+
+As seen in the treemap above, Central Area seems to have one of the highest average prices of resale flats across the different flat types in Singapore. Other towns which have a high average price of resale flats across the different flat types include Queenstown, Bishan and Bukit Merah.
+
+### 3.3 Resale Prices vs Flat Models
+
+One way to compare the resale prices by flat models would be to plot a violin plot to view the distribution as well as the mean price of the resale flats. The code chunk below intends to do that. We are focusing on the flat models of Improved, Model A and New Generation as these are the models which had a higher number of resale flats as per our exploration in previous steps.
+
+```{r}
+#| code-fold: true
+#| fig-width: 12
+#| fig-height: 8
+
+flatModels <- resaleFlats %>%
+  filter(flat_model %in% c("Improved", "Model A", "New Generation"))
+
+fig6 <- ggbetweenstats(
+  data = flatModels,
+  x = "flat_model",
+  y = "resale_price",
+  type = "np") +
+  ggtitle("Non-Parametric Analysis of Resale Prices by Flat Model")
+
+ggplotly(fig6)
+```
+
+From the above violin plot, we can observe that the mean of resale prices for Improved flats slightly higher that mean of resale price of Model A. On the other hand, the mean of resale price of New Generation flats are significantly lower.
+
+### 3.4 Resale Prices by Flat Types
+
+The following code chunk plots the average resale prices by flat types across 2022 for each town:
+
+```{r}
+#| code-fold: true
+#| fig-width: 12
+#| fig-height: 12
+
+fig2 <- ggplot(groupedTowns,
+       aes(x = Date,
+           y = avgPrice)) +
+  geom_line(aes(colour = flat_type)) +
+  facet_wrap(~ town) +
+  labs(title = "Trend of Resale Prices by Flat Types in Singapore Towns, 2022") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+ggplotly(fig2)
+```
+
+As seen in the interactive plot above, the average resale prices in towns such as Central Area, Bishan, Clementi and Toa Payoh seem to be very high as when compared to towns such as Choa Chu Kang, Jurong West and Sembawang.
+
+Another way to visualize the resale prices by flat types would be plot a violin plot.
+
+```{r}
+#| code-fold: true
+#| fig-width: 12
+#| fig-height: 8
+
+fig7 <- ggbetweenstats(
+  data = resaleFlats,
+  x = "flat_type",
+  y = "resale_price",
+  type = "np") +
+  ggtitle("Non-Parametric Analysis of Resale Prices by Flat Type")
+
+ggplotly(fig7)
+```
+
+### 3.5 Resale Prices vs Floor Area
+
+Let's use the code chunk below to find out if there is a correlation between the resale price and the floor area:
+
+```{r}
+#| code-fold: true
+#| fig-width: 12
+#| fig-height: 12
+
+fig4 <- ggscatterstats(
+  data = resaleFlats,
+  x = floor_area_sqm,
+  y = resale_price,
+  marginal = FALSE,
+  point.args = list(size = 0.5,
+                    stroke = 0,
+                    colour = "grey"),
+  smooth.line.args = list(linewidth = 0.5,
+                          colour = "black",
+                          method = "lm")) +
+  labs(title = "Correlation between Resale Prices and Floor Area, 2022") +
+  facet_wrap(~ town)
+
+ggplotly(fig4)
+```
+
+This scatterplot helps to depict the relationship between the two numerical variables resale_price and floor_area_sqm. So how do we read this plot? The angles of the lines depict the relationship between the two variables, and this could be either a positive or negative relationship. At once glance, we can tell that there is a positive correlation between these two variables. However, when looking at towns such as Central Area and Toa Payoh, we can note that the relationship is not as linear as the relationship in other towns.
+
+### 3.6 Resale Prices vs Floor Area by Month
+
+Let's use the code chunk below to find out the trend of the resale prices by floor area across the months. We will narrow down our analysis to only focus on 5 Room flats for this visualization. 
+
+```{r}
+#| code-fold: true
+#| fig-width: 12
+#| fig-height: 12
+
+improvedModels <- resaleFlats %>%
+  filter(flat_model == "Improved") %>%
+  filter(flat_type == "5 ROOM")
+
+heatmap <- ggplot(improvedModels,
+                  aes(x = Date,
+                      y = floor_area_sqm,
+                      fill = resale_price)) +
+  geom_tile() +
+  labs(title = "5 Room Flat's Resale Prices by Floor Area in 2022")
+
+ggplotly(heatmap)
+```
+
+From this heatmap, we will be unable to predict the resale price of a 5 room flat for the next month as you can see that there is an inconsistency in the resale prices when compared against the floor area. This could be something that further explore in the future as there could be other factors that influence the resale prices.
 
 This concludes the work submitted for Take-Home Exercise 3. Thank you!
