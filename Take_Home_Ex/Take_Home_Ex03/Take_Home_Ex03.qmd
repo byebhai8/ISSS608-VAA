@@ -10,4 +10,59 @@ editor: visual
 
 The following is my submission for Take-Home Exercise 3.
 
+# 1. Task
+
+In this take-home exercise, we are required to uncover the salient patterns of the resale prices of public housing property by residential towns and estates in Singapore by using appropriate analytical visualization techniques learned in Lesson 4: Fundamentals of Visual Analytics. We are encouraged to apply appropriate interactive techniques to enhance user and data discovery experiences.
+
+For the purpose of this study, the focus would be on 3-ROOM, 4-ROOM and 5-ROOM types. We can choose to focus on either one housing type or multiple housing types. In my case, I will be focusing on multiple housing types for the year 2022.
+
+# 2. Dataset
+
+## 2.1 Data Source
+
+The dataset used in this take-home exercise was downloaded from the following link: <https://data.gov.sg/dataset/resale-flat-prices>
+
+We are using the Resale flat prices based on registration date from Jan-2017 onwards csv file for this exercise.
+
+![](images/01.png)
+
+## 2.2 Data Preparation
+
+First, let's load the dataset and the libraries that we will be using:
+
+```{r}
+pacman::p_load(tidyverse, lubridate)
+rawData <- read_csv("resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
+```
+
+Let's take a look at this dataset:
+
+```{r}
+head(rawData)
+summary(rawData)
+```
+
+As you can see, the month column is in the format of YYYY-MM. Using the month column, we can actually create three new columns - Month, Quarter and Year, which would be useful when building visualizations.
+
+```{r}
+data <- rawData %>%
+  mutate(Month = month(ym(month))) %>%
+  mutate(Quarter = quarter(ym(month))) %>%
+  mutate(Year = year(ym(month)))
+summary(data)
+```
+
+Since we will only be focusing on the year 2022, we will filter the dataset to only keep records for the year 2022. Also, we only want to work with records which have a flat type of 3-Room, 4-Room or 5-Room. Let's filter the data to meet this condition.
+
+```{r}
+resaleFlats <- data %>%
+  filter(Year == "2022") %>%
+  filter(flat_type %in% c("3 ROOM", "4 ROOM", "5 ROOM"))
+head(resaleFlats)
+```
+
+The data is now ready for exploration and visualization.
+
+## 2.3 Data Exploration
+
 This concludes the work submitted for Take-Home Exercise 3. Thank you!
