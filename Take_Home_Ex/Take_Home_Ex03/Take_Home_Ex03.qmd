@@ -1,0 +1,13 @@
+---
+title: "Take-Home Exercise 3"
+author: "Bhairavi"
+date: "15 February 2023"
+execute:
+  warning: false
+format: html
+editor: visual
+---
+
+The following is my submission for Take-Home Exercise 3.
+
+This concludes the work submitted for Take-Home Exercise 3. Thank you!
