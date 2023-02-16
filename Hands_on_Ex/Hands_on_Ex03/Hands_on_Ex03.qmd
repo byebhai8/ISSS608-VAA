@@ -1,5 +1,5 @@
 ---
-title: "Hands-On Exercise 3: Programming Interactive Data Visualization with R"
+title: "Hands-on Exercise 3: Programming Interactive Data Visualization with R"
 author: "Bhairavi"
 date: "6 February 2023"
 ---
