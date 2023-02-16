@@ -6,11 +6,11 @@ date: "16 February 2023"
 
 # Visual Analysis with ggstatsplot
 
-- An extension of ggplot2 package for creating graphics with details from statistical tests included in the plot themselves
-- Provides an alternative statistical inference method by default
-- Follows best practices for statistical reporting
+-   An extension of ggplot2 package for creating graphics with details from statistical tests included in the plot themselves
+-   Provides an alternative statistical inference method by default
+-   Follows best practices for statistical reporting
 
-For all statistical tests reported in the plots, the default template abbides by the APA gold standard for statistical reporting
+For all statistical tests reported in the plots, the default template abides by the APA gold standard for statistical reporting
 
 ### Installing & Launching Packages
 
@@ -28,7 +28,7 @@ exam <- read_csv("data/Exam_data.csv")
 
 ### One Sample Test
 
-In the code chunk below, gghistostats() is used to build a visual of one-sample test on English scores. More information can be found here: https://indrajeetpatil.github.io/ggstatsplot/reference/gghistostats.html
+In the code chunk below, gghistostats() is used to build a visual of one-sample test on English scores. More information can be found here: <https://indrajeetpatil.github.io/ggstatsplot/reference/gghistostats.html>
 
 ```{r}
 set.seed(1234)
@@ -44,12 +44,12 @@ gghistostats(
 
 ### Bayes Factor
 
-- A Bayes factor is the ratio of the likelihood of one particular hypothesis to the likelihood of another
-- Can be interpreted as a measure of the strength of evidence in favor of one theory among two competing theories
-- Bayes factor gives us a way to evaluate the data in favor of a null hypothesis, and allows us to use external information to do so
-- It tells us what the weight of the evidence is in favor of a give hypothesis
-- When comparing two hypotheses, H1 (alternate hypotheses) and H0 (null hypothesis), the Bayes factor is often written as B10
-- The Schwarz criterion is one of the easiest ways to calculate rough approximation of the Bayes factor
+-   A Bayes factor is the ratio of the likelihood of one particular hypothesis to the likelihood of another
+-   Can be interpreted as a measure of the strength of evidence in favor of one theory among two competing theories
+-   Bayes factor gives us a way to evaluate the data in favor of a null hypothesis, and allows us to use external information to do so
+-   It tells us what the weight of the evidence is in favor of a give hypothesis
+-   When comparing two hypotheses, H1 (alternate hypotheses) and H0 (null hypothesis), the Bayes factor is often written as B10
+-   The Schwarz criterion is one of the easiest ways to calculate rough approximation of the Bayes factor
 
 ### Two Sample Mean Test
 
