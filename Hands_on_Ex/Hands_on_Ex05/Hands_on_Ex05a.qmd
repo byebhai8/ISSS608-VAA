@@ -1,0 +1,7 @@
+---
+title: "Hands-on Exercise 5: Ternary Plots"
+author: "Bhairavi"
+date: "17 February 2023"
+---
+
+x
