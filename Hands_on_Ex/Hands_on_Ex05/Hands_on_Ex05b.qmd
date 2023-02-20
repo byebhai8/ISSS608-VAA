@@ -10,13 +10,13 @@ Correlation coefficient is a popular statistic that is used to measure the type 
 
 When multivariate data are used, the correlation coefficients of the pair comparisons are displayed in a table form known as correlation matrix or scatterplot matrix.
 
-There are three broad reasons fooo computing a correlatin matrix:
+There are three broad reasons for computing a correlation matrix:
 
 - to reveal the relationship between high-dimensional variables pair-wisely
 - to input into other analyses
 - as a diagnostic when checking other analyses
 
-When the data is large, both in terms of the number of observations and the number of variables, Corrgram tends to be used to visually explore and analyse the structure and the patterns of relations among variables. It is designed based on two main schemes:
+When the data is large, both in terms of the number of observations and the number of variables, corrgram tends to be used to visually explore and analyse the structure and the patterns of relations among variables. It is designed based on two main schemes:
 
 - rendering the value of a correlation to depict its sign and magnitude
 - reordering the variables in a correlation matrix so that "similar" variables are positioned adjacently, facilitating perception
