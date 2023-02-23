@@ -244,12 +244,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
-  
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#task" id="toc-task" class="nav-link active" data-scroll-target="#task">Task</a></li>
+  <li><a href="#installing-launching-r-packages" id="toc-installing-launching-r-packages" class="nav-link" data-scroll-target="#installing-launching-r-packages">Installing &amp; Launching R Packages</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a>
+  <ul class="collapse">
+  <li><a href="#data-source" id="toc-data-source" class="nav-link" data-scroll-target="#data-source">Data Source</a></li>
+  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data Preparation</a></li>
+  </ul></li>
+  <li><a href="#data-exploration-visualization" id="toc-data-exploration-visualization" class="nav-link" data-scroll-target="#data-exploration-visualization">Data Exploration &amp; Visualization</a></li>
+  </ul>
+</nav>
+</nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
     </div>
 <!-- main -->
-<main class="content column-page" id="quarto-document-content">
+<main class="content column-page-right" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -280,63 +295,173 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
+<section id="task" class="level1">
+<h1>Task</h1>
 <p>xx</p>
+</section>
+<section id="installing-launching-r-packages" class="level1">
+<h1>Installing &amp; Launching R Packages</h1>
 <p>load the libraries</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(lubridate, readxl, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="dataset" class="level1">
+<h1>Dataset</h1>
+<section id="data-source" class="level3">
+<h3 class="anchored" data-anchor-id="data-source">Data Source</h3>
+<p>xx</p>
+</section>
+<section id="data-preparation" class="level3">
+<h3 class="anchored" data-anchor-id="data-preparation">Data Preparation</h3>
 <p>load the dataset ignore the top and bottom rows</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>merchImportRaw <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"outputFile.xlsx"</span>,</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>merchImportRaw <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"outputFile.xlsx"</span>,</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">sheet =</span> <span class="st">"T1"</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">skip =</span> <span class="dv">9</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>merchImport <span class="ot">&lt;-</span> <span class="fu">slice</span>(merchImportRaw,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                     <span class="dv">2</span><span class="sc">:</span>(<span class="fu">n</span>() <span class="sc">-</span> <span class="dv">23</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                     <span class="dv">2</span><span class="sc">:</span>(<span class="fu">n</span>() <span class="sc">-</span> <span class="dv">23</span>))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>merchExportRaw <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"outputFile.xlsx"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">sheet =</span> <span class="st">"T2"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">skip =</span> <span class="dv">9</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>merchExport <span class="ot">&lt;-</span> <span class="fu">slice</span>(merchExportRaw,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                     <span class="dv">2</span><span class="sc">:</span>(<span class="fu">n</span>() <span class="sc">-</span> <span class="dv">23</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>exclude columns which are not in this range: <strong>January 2020 to December 2022</strong></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>merchImport <span class="ot">&lt;-</span> merchImport <span class="sc">%&gt;%</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">38</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">38</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>merchExport <span class="ot">&lt;-</span> merchExport <span class="sc">%&gt;%</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">38</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>covert all rows which are in the millions format to be in the thousands format, or split these rows into another dataframe</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>merchImportMills <span class="ot">&lt;-</span> <span class="fu">slice</span>(merchImport,</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                          <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>merchImportThous <span class="ot">&lt;-</span> <span class="fu">slice</span>(merchImport,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                          <span class="dv">7</span><span class="sc">:</span><span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>merchImportThous <span class="ot">&lt;-</span> <span class="fu">slice</span>(merchImport,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                          <span class="dv">7</span><span class="sc">:</span><span class="fu">n</span>())</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>merchExportMills <span class="ot">&lt;-</span> <span class="fu">slice</span>(merchExport,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                          <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>merchExportThous <span class="ot">&lt;-</span> <span class="fu">slice</span>(merchExport,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                          <span class="dv">7</span><span class="sc">:</span><span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>pivot the values for the date range: covert to one column to contain the month year, and one column to contain the amount in thousands</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>merchImportMills <span class="ot">&lt;-</span> merchImportMills <span class="sc">%&gt;%</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">!</span><span class="st">`</span><span class="at">Data Series</span><span class="st">`</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"Period"</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"Amount"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"Import Amount (m)"</span>)</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>merchImportThous <span class="ot">&lt;-</span> merchImportThous <span class="sc">%&gt;%</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">!</span><span class="st">`</span><span class="at">Data Series</span><span class="st">`</span>,</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"Period"</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"Amount"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"Import Amount (k)"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>merchExportMills <span class="ot">&lt;-</span> merchExportMills <span class="sc">%&gt;%</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">!</span><span class="st">`</span><span class="at">Data Series</span><span class="st">`</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"Period"</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"Export Amount (m)"</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>merchExportThous <span class="ot">&lt;-</span> merchExportThous <span class="sc">%&gt;%</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="sc">!</span><span class="st">`</span><span class="at">Data Series</span><span class="st">`</span>,</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"Period"</span>,</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"Export Amount (k)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>merge the import and export columns into one data frame</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>merchMills <span class="ot">&lt;-</span> <span class="fu">merge</span>(merchImportMills,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                    merchExportMills,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Data Series"</span>, <span class="st">"Period"</span>))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>merchThous <span class="ot">&lt;-</span> <span class="fu">merge</span>(merchImportThous,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                    merchExportThous,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Data Series"</span>, <span class="st">"Period"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>split the period column into a year and month column</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>merchImportMills <span class="ot">&lt;-</span> merchImportMills <span class="sc">%&gt;%</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as.Date</span>(<span class="fu">paste</span>(Period, <span class="st">"01"</span>),</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"%Y %B %d"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(Date)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Quarter =</span> <span class="fu">quarters</span>(Date)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> <span class="fu">month</span>(Date))</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>merchImportThous <span class="ot">&lt;-</span> merchImportThous <span class="sc">%&gt;%</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as.Date</span>(<span class="fu">paste</span>(Period, <span class="st">"01"</span>),</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"%Y %B %d"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(Date)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Quarter =</span> <span class="fu">quarters</span>(Date)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> <span class="fu">month</span>(Date))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>merchMills <span class="ot">&lt;-</span> merchMills <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as.Date</span>(<span class="fu">paste</span>(Period, <span class="st">"01"</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"%Y %B %d"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(Date)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Quarter =</span> <span class="fu">quarters</span>(Date)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> <span class="fu">month</span>(Date))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>merchThous <span class="ot">&lt;-</span> merchThous <span class="sc">%&gt;%</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Date =</span> <span class="fu">as.Date</span>(<span class="fu">paste</span>(Period, <span class="st">"01"</span>),</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"%Y %B %d"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(Date)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Quarter =</span> <span class="fu">quarters</span>(Date)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> <span class="fu">month</span>(Date))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>sort the data frame by data series and period</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>merchMills <span class="ot">&lt;-</span> merchMills <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Data Series</span><span class="st">`</span>, <span class="st">`</span><span class="at">Date</span><span class="st">`</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>merchThous <span class="ot">&lt;-</span> merchThous <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="st">`</span><span class="at">Data Series</span><span class="st">`</span>, <span class="st">`</span><span class="at">Date</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>remove the text millions and thousands from the data frame</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>merchMills <span class="ot">&lt;-</span> merchMills <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Data Series</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">str_replace_all</span>(<span class="st">`</span><span class="at">Data Series</span><span class="st">`</span>, <span class="st">" </span><span class="sc">\\</span><span class="st">(Million Dollars</span><span class="sc">\\</span><span class="st">)"</span>, <span class="st">""</span>))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>merchThous <span class="ot">&lt;-</span> merchThous <span class="sc">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Data Series</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">str_replace_all</span>(<span class="st">`</span><span class="at">Data Series</span><span class="st">`</span>, <span class="st">" </span><span class="sc">\\</span><span class="st">(Thousand Dollars</span><span class="sc">\\</span><span class="st">)"</span>, <span class="st">""</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The dataset is ready for visualization</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(merchMills)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Data Series   Period Import Amount (m) Export Amount (m)       Date Year
+1      Africa 2020 Jan             528.6             721.8 2020-01-01 2020
+2      Africa 2020 Feb             666.1             841.0 2020-02-01 2020
+3      Africa 2020 Mar             559.4             916.5 2020-03-01 2020
+4      Africa 2020 Apr             372.6             568.8 2020-04-01 2020
+5      Africa 2020 May             409.6             412.8 2020-05-01 2020
+6      Africa 2020 Jun             238.2             452.1 2020-06-01 2020
+  Quarter Month
+1      Q1     1
+2      Q1     2
+3      Q1     3
+4      Q2     4
+5      Q2     5
+6      Q2     6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(merchThous)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Data Series   Period Import Amount (k) Export Amount (k)       Date Year
+1 Afghanistan 2020 Jan                 7              3606 2020-01-01 2020
+2 Afghanistan 2020 Feb                66              2199 2020-02-01 2020
+3 Afghanistan 2020 Mar                 6              5293 2020-03-01 2020
+4 Afghanistan 2020 Apr                16              1771 2020-04-01 2020
+5 Afghanistan 2020 May                15              3709 2020-05-01 2020
+6 Afghanistan 2020 Jun                72              1752 2020-06-01 2020
+  Quarter Month
+1      Q1     1
+2      Q1     2
+3      Q1     3
+4      Q2     4
+5      Q2     5
+6      Q2     6</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="data-exploration-visualization" class="level1">
+<h1>Data Exploration &amp; Visualization</h1>
+<p>Time-series data visualization Methods Line graph Control chart Slopegraph Cycle plot Horizon graph Sunburst diagram Calendar Heatmap Stream Graph</p>
 <p>xx</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

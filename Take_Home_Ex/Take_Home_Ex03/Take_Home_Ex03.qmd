@@ -75,12 +75,12 @@ unique(resaleFlats$flat_model)
 
 For this exercise, we will focus on the following areas:
 
-1. Resale Flats by Flat Models
-2. Resale Flats by Flat Types
-3. Resale Prices by Flat Models
-4. Resale Prices by Flat Types
-5. Resale Prices vs Floor Area
-6. Resale Prices vs Floor Area by Month
+1.  Resale Flats by Flat Models
+2.  Resale Flats by Flat Types
+3.  Resale Prices by Flat Models
+4.  Resale Prices by Flat Types
+5.  Resale Prices vs Floor Area
+6.  Resale Prices vs Floor Area by Month
 
 ### 3.1 Resale Flats by Flat Models
 
@@ -260,7 +260,7 @@ This scatterplot helps to depict the relationship between the two numerical vari
 
 ### 3.6 Resale Prices vs Floor Area by Month
 
-Let's use the code chunk below to find out the trend of the resale prices by floor area across the months. We will narrow down our analysis to only focus on 5 Room flats for this visualization. 
+Let's use the code chunk below to find out the trend of the resale prices by floor area across the months. We will narrow down our analysis to only focus on 5 Room flats for this visualization.
 
 ```{r}
 #| code-fold: true

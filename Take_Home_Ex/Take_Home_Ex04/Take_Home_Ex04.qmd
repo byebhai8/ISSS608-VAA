@@ -8,7 +8,11 @@ format: html
 editor: visual
 ---
 
+# Task
+
 xx
+
+# Installing & Launching R Packages
 
 load the libraries
 
@@ -16,15 +20,29 @@ load the libraries
 pacman::p_load(lubridate, readxl, tidyverse)
 ```
 
-load the dataset
-ignore the top and bottom rows
+# Dataset
+
+### Data Source
+
+xx
+
+### Data Preparation
+
+load the dataset ignore the top and bottom rows
 
 ```{r}
-merchImportRaw <- read_xlsx("outputFile.xlsx",
+merchImportRaw <- read_excel("outputFile.xlsx",
                        sheet = "T1",
                        skip = 9)
 
 merchImport <- slice(merchImportRaw,
+                     2:(n() - 23))
+
+merchExportRaw <- read_excel("outputFile.xlsx",
+                       sheet = "T2",
+                       skip = 9)
+
+merchExport <- slice(merchExportRaw,
                      2:(n() - 23))
 ```
 
@@ -33,6 +51,9 @@ exclude columns which are not in this range: **January 2020 to December 2022**
 ```{r}
 merchImport <- merchImport %>%
   select(1, 3:38)
+
+merchExport <- merchExport %>%
+  select(1, 3:38)
 ```
 
 covert all rows which are in the millions format to be in the thousands format, or split these rows into another dataframe
@@ -40,7 +61,14 @@ covert all rows which are in the millions format to be in the thousands format, 
 ```{r}
 merchImportMills <- slice(merchImport,
                           1:6)
+
 merchImportThous <- slice(merchImport,
+                          7:n())
+
+merchExportMills <- slice(merchExport,
+                          1:6)
+
+merchExportThous <- slice(merchExport,
                           7:n())
 ```
 
@@ -50,30 +78,91 @@ pivot the values for the date range: covert to one column to contain the month y
 merchImportMills <- merchImportMills %>%
   pivot_longer(cols = !`Data Series`,
                names_to = "Period",
-               values_to = "Amount")
+               values_to = "Import Amount (m)")
 
 merchImportThous <- merchImportThous %>%
   pivot_longer(cols = !`Data Series`,
                names_to = "Period",
-               values_to = "Amount")
+               values_to = "Import Amount (k)")
+
+merchExportMills <- merchExportMills %>%
+  pivot_longer(cols = !`Data Series`,
+               names_to = "Period",
+               values_to = "Export Amount (m)")
+
+merchExportThous <- merchExportThous %>%
+  pivot_longer(cols = !`Data Series`,
+               names_to = "Period",
+               values_to = "Export Amount (k)")
+```
+
+merge the import and export columns into one data frame
+
+```{r}
+merchMills <- merge(merchImportMills,
+                    merchExportMills,
+                    by = c("Data Series", "Period"))
+
+merchThous <- merge(merchImportThous,
+                    merchExportThous,
+                    by = c("Data Series", "Period"))
 ```
 
 split the period column into a year and month column
 
 ```{r}
-merchImportMills <- merchImportMills %>%
+merchMills <- merchMills %>%
   mutate(Date = as.Date(paste(Period, "01"),
                         "%Y %B %d")) %>%
   mutate(Year = year(Date)) %>%
   mutate(Quarter = quarters(Date)) %>%
   mutate(Month = month(Date))
 
-merchImportThous <- merchImportThous %>%
+merchThous <- merchThous %>%
   mutate(Date = as.Date(paste(Period, "01"),
                         "%Y %B %d")) %>%
   mutate(Year = year(Date)) %>%
   mutate(Quarter = quarters(Date)) %>%
   mutate(Month = month(Date))
 ```
+
+sort the data frame by data series and period
+
+```{r}
+merchMills <- merchMills %>%
+  arrange(`Data Series`, `Date`)
+
+merchThous <- merchThous %>%
+  arrange(`Data Series`, `Date`)
+```
+
+remove the text millions and thousands from the data frame
+
+```{r}
+merchMills <- merchMills %>%
+  mutate(`Data Series` = str_replace_all(`Data Series`, " \\(Million Dollars\\)", ""))
+
+merchThous <- merchThous %>%
+  mutate(`Data Series` = str_replace_all(`Data Series`, " \\(Thousand Dollars\\)", ""))
+```
+
+The dataset is ready for visualization
+
+```{r}
+head(merchMills)
+head(merchThous)
+```
+
+# Data Exploration & Visualization
+
+Time-series data visualization Methods 
+Line graph 
+Control chart
+Slopegraph 
+Cycle plot 
+Horizon graph 
+Sunburst diagram 
+Calendar Heatmap 
+Stream Graph
 
 xx
