@@ -342,10 +342,99 @@ ggplot(data = merchMillsExport,
 
 xx
 
-## Slopegraph
+## Slopegraphs
 
-xx
+:::: panel-tabset
 
+### Import By Region
+
+```{r}
+merchMillsImport <- merchMillsImport %>%
+  mutate(Year = as.character(Date, format = '%Y'))
+
+tmp2020import <- merchMillsImport %>% filter(Year == 2020)
+tmp2022import <- merchMillsImport %>% filter(Year == 2022)
+
+importAmount2020 <- tmp2020import$`Amount (M)`
+importAmount2022 <- tmp2022import$`Amount (M)`
+group <- tmp2020import$`Data Series`
+years <- 3
+
+a <- data.frame(importAmount2020, importAmount2022, group)
+a <- a %>%
+  group_by(group) %>%
+  summarise(total2020 = sum(importAmount2020), total2022 = sum(importAmount2022))
+
+lab2020 <- paste(a$group, round(a$total2020), sep = ", ")
+lab2022 <- paste(a$group, round(a$total2022), sep = ", ")
+
+fig6 <- ggplot(a) +
+  geom_segment(aes(x = 0, xend = years, y = total2020, yend = total2022), size = 0.5) +
+  ggtitle("Imports by Region") +
+  geom_text(label = lab2020, y = a$total2020, x = -0.5, hjust = 1, vjust = 0.5, size = 2) +
+  geom_text(label = lab2022, y = a$total2022, x = 3.5, hjust = 0, vjust = 0.5, size = 2) +
+  geom_text(label = "2020", x = 0, y = (1.03 * max(a$total2020, a$total2022)), hjust = 0.2, size = 3) +
+  geom_text(label = "2022", x = years, y = (1.03 * max(a$total2020, a$total2022)), hjust = 0, size = 3) +
+  xlim(-1, (years + 1)) +
+  ylim(min(a$total2020, a$total2022) -50, max(a$total2020, a$total2022) + 50) +
+  xlab("") +
+  ylab("") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.border = element_blank())
+
+ggplotly(fig6)
+```
+
+### Export By Region
+
+```{r}
+merchMillsExport <- merchMillsExport %>%
+  mutate(Year = as.character(Date, format = '%Y'))
+
+tmp2020export <- merchMillsExport %>% filter(Year == 2020)
+tmp2022export <- merchMillsExport %>% filter(Year == 2022)
+
+exportAmount2020 <- tmp2020export$`Amount (M)`
+exportAmount2022 <- tmp2022export$`Amount (M)`
+group <- tmp2020export$`Data Series`
+years <- 3
+
+b <- data.frame(exportAmount2020, exportAmount2022, group)
+b <- b %>%
+  group_by(group) %>%
+  summarise(total2020 = sum(exportAmount2020), total2022 = sum(exportAmount2022))
+
+lab2020 <- paste(b$group, round(b$total2020), sep = ", ")
+lab2022 <- paste(b$group, round(b$total2022), sep = ", ")
+
+fig7 <- ggplot(b) +
+  geom_segment(aes(x = 0, xend = years, y = total2020, yend = total2022), size = 0.5) +
+  ggtitle("Exports by Region") +
+  geom_text(label = lab2020, y = b$total2020, x = -0.5, hjust = 1, vjust = 0.5, size = 2) +
+  geom_text(label = lab2022, y = b$total2022, x = 3.5, hjust = 0, vjust = 0.5, size = 2) +
+  geom_text(label = "2020", x = 0, y = (1.03 * max(b$total2020, b$total2022)), hjust = 0.2, size = 3) +
+  geom_text(label = "2022", x = years, y = (1.03 * max(b$total2020, b$total2022)), hjust = 0, size = 3) +
+  xlim(-1, (years + 1)) +
+  ylim(min(b$total2020, b$total2022) -50, max(b$total2020, b$total2022) + 50) +
+  xlab("") +
+  ylab("") +
+  theme_bw() +
+  theme(panel.background = element_blank(),
+        panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.border = element_blank())
+
+ggplotly(fig7)
+```
+
+:::
+
+xxx
 
 ## Horizon graph 
 
@@ -379,8 +468,6 @@ treeCountry <- d3_nest(hierCountry, value_cols = "totalAmount")
 
 sunburst(data = treeCountry,
          valueField = "totalAmount",
-         height = 400,
-         width = "100%",
          legend = FALSE)
 ```
 
