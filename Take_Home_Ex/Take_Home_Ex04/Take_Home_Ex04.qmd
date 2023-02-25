@@ -4,7 +4,10 @@ author: "Bhairavi"
 date: "26 February 2023"
 execute:
   warning: false
-format: html
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show/Hide"
 editor: visual
 ---
 
@@ -17,7 +20,7 @@ xx
 load the libraries
 
 ```{r}
-pacman::p_load(ggplot2, plotly, ggridges, gganimate, lubridate, readxl, tidyverse)
+pacman::p_load(ggplot2, plotly, ggridges, gganimate, sunburstR, d3r, lubridate, readxl, tidyverse)
 ```
 
 # Dataset
@@ -317,7 +320,6 @@ merchTotalMillsExport
 ### Import
 
 ```{r}
-#| code-fold: true
 ggplot(data = merchTotalMillsImport,
                aes(x = `Amount (M)`,
                    y = factor(Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")),
@@ -334,7 +336,6 @@ ggplot(data = merchTotalMillsImport,
 ### Export
 
 ```{r}
-#| code-fold: true
 ggplot(data = merchTotalMillsExport,
        aes(x = `Amount (M)`,
            y = factor(Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")),
@@ -357,7 +358,6 @@ ggplot(data = merchTotalMillsExport,
 ### Import
 
 ```{r}
-#| code-fold: true
 merchMillsImport <- subset(merchMills, Type == "Import")
 
 merchMillsImport <- merchMillsImport %>%
@@ -381,7 +381,6 @@ ggplot(data = merchMillsImport,
 ### Export
 
 ```{r}
-#| code-fold: true
 merchMillsExport <- subset(merchMills, Type == "Export")
 
 merchMillsExport <- merchMillsExport %>%
@@ -404,12 +403,45 @@ ggplot(data = merchMillsExport,
 
 :::
 
-### Control chart 
+## Control chart 
 
 Slopegraph
 Horizon graph 
-Sunburst diagram 
-Calendar 
+
+## Sunburst Diagrams
+
+:::: panel-tabset
+
+### By Region
+
+```{r}
+hierRegion <- merchMills %>%
+  group_by(Type, `Data Series`) %>%
+  summarize(totalAmount = sum(`Amount (M)`))
+
+treeRegion <- d3_nest(hierRegion, value_cols = "totalAmount")
+
+sund2b(data = treeRegion,
+       valueField = "totalAmount")
+```
+
+### By Country
+
+```{r}
+hierCountry <- merchThous %>%
+  group_by(Type, `Data Series`) %>%
+  summarize(totalAmount = sum(`Amount (K)`))
+
+treeCountry <- d3_nest(hierCountry, value_cols = "totalAmount")
+
+sund2b(data = treeCountry,
+       valueField = "totalAmount")
+```
+
+:::
+
+## Calendar 
+
 Heatmap 
 Stream Graph
 
