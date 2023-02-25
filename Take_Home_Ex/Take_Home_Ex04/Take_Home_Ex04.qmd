@@ -17,7 +17,7 @@ xx
 load the libraries
 
 ```{r}
-pacman::p_load(ggplot2, plotly, ggridges, lubridate, readxl, tidyverse)
+pacman::p_load(ggplot2, plotly, ggridges, gganimate, lubridate, readxl, tidyverse)
 ```
 
 # Dataset
@@ -301,7 +301,111 @@ fig4 <- ggplot() +
 ggplotly(fig4)
 ```
 
-Control chart 
+Ridgeline plot
+
+```{r}
+merchTotalMillsImport <- subset(merchTotalMills, Type == "Import")
+merchTotalMillsExport <- subset(merchTotalMills, Type == "Export")
+
+merchTotalMillsImport
+merchTotalMillsExport
+```
+## Ridgeline
+
+:::: panel-tabset
+
+### Import
+
+```{r}
+#| code-fold: true
+ggplot(data = merchTotalMillsImport,
+               aes(x = `Amount (M)`,
+                   y = factor(Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")),
+                   fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3,
+                               rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Amount (M)",
+                       option = "C") +
+  labs(title = "Ridgeline Plot showing trend of Imports by month, 2020 to 2022") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+### Export
+
+```{r}
+#| code-fold: true
+ggplot(data = merchTotalMillsExport,
+       aes(x = `Amount (M)`,
+           y = factor(Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")),
+           fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3,
+                               rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Amount (M)",
+                       option = "C") +
+  labs(title = "Ridgeline Plot showing trend of Exports by month, 2020 to 2022") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) 
+```
+
+:::
+
+## Ridgline by Regions
+
+:::: panel-tabset
+
+### Import
+
+```{r}
+#| code-fold: true
+merchMillsImport <- subset(merchMills, Type == "Import")
+
+merchMillsImport <- merchMillsImport %>%
+  mutate(NewYear = year(Date))
+
+ggplot(data = merchMillsImport,
+       aes(x = `Amount (M)`,
+           y = `Data Series`,
+           fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3,
+                               rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Amount (M)",
+                       option = "C") +
+  labs(title = "Ridgeline Plot showing trend of Imports by Region, 2020 to 2022") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  transition_time(NewYear) +
+  ease_aes('linear')
+```
+
+### Export
+
+```{r}
+#| code-fold: true
+merchMillsExport <- subset(merchMills, Type == "Export")
+
+merchMillsExport <- merchMillsExport %>%
+  mutate(NewYear = year(Date))
+
+ggplot(data = merchMillsExport,
+       aes(x = `Amount (M)`,
+           y = `Data Series`,
+           fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3,
+                               rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Amount (M)",
+                       option = "C") +
+  labs(title = "Ridgeline Plot showing trend of Imports by Region, 2020 to 2022") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  transition_time(NewYear) +
+  ease_aes('linear')
+```
+
+:::
+
+### Control chart 
+
 Slopegraph
 Horizon graph 
 Sunburst diagram 
