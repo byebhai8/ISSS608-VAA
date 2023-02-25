@@ -11,6 +11,8 @@ format:
 editor: visual
 ---
 
+The following is my submission for Take-Home Exercise 4.
+
 # Task
 
 xx
@@ -31,207 +33,163 @@ xx
 
 ### Data Preparation
 
-load the dataset ignore the top and bottom rows
-
-```{r}
-merchImportRaw <- read_excel("outputFile.xlsx",
-                       sheet = "T1",
-                       skip = 9)
-
-merchImport <- slice(merchImportRaw,
-                     2:(n() - 23))
-
-merchImportTotal <- slice(merchImportRaw,
-                     1:1)
-
-merchExportRaw <- read_excel("outputFile.xlsx",
-                       sheet = "T2",
-                       skip = 9)
-
-merchExport <- slice(merchExportRaw,
-                     2:(n() - 23))
-
-merchExportTotal <- slice(merchExportRaw,
-                     1:1)
-```
-
+load the IMPORT datasets
+ignore the top and bottom rows
 exclude columns which are not in this range: **January 2020 to December 2022**
-
-```{r}
-merchImport <- merchImport %>%
-  select(1, 3:38)
-
-merchExport <- merchExport %>%
-  select(1, 3:38)
-
-merchImportTotal <- merchImportTotal %>%
-  select(1, 3:38)
-
-merchExportTotal <- merchExportTotal %>%
-  select(1, 3:38)
-```
-
-convert all rows which are in the millions format to be in the thousands format, or split these rows into another data frame
-
-```{r}
-merchImportMills <- slice(merchImport,
-                          1:6)
-
-merchImportThous <- slice(merchImport,
-                          7:n())
-
-merchExportMills <- slice(merchExport,
-                          1:6)
-
-merchExportThous <- slice(merchExport,
-                          7:n())
-```
-
+convert all rows which are in the millions format to be in the thousands format, 
+or split these rows into another data frame
 pivot the values for the date range: covert to one column to contain the month year, and one column to contain the amount in thousands
+change thousands to millions to standardize the comparison
 
 ```{r}
-merchImportMills <- merchImportMills %>%
+merchImportRaw <- read_excel("outputFile.xlsx", sheet = "T1", skip = 9)
+
+merchImport <- slice(merchImportRaw, 2:(n() - 23)) %>%
+  select(1, 3:38)
+
+merchImportMills <- slice(merchImport, 1:6) %>%
   pivot_longer(cols = !`Data Series`,
                names_to = "Period",
                values_to = "Import")
 
-merchImportThous <- merchImportThous %>%
+merchImportThous <- slice(merchImport, 7:n()) %>%
   pivot_longer(cols = !`Data Series`,
                names_to = "Period",
                values_to = "Import")
 
-merchExportMills <- merchExportMills %>%
+merchImportTotal <- slice(merchImportRaw, 1:1) %>%
+  select(1, 3:38) %>%
   pivot_longer(cols = !`Data Series`,
                names_to = "Period",
-               values_to = "Export")
-
-merchExportThous <- merchExportThous %>%
-  pivot_longer(cols = !`Data Series`,
-               names_to = "Period",
-               values_to = "Export")
-
-merchImportTotalThous <- merchImportTotal %>%
-  pivot_longer(cols = !`Data Series`,
-               names_to = "Period",
-               values_to = "Import")
-
-merchExportTotalThous <- merchExportTotal %>%
-  pivot_longer(cols = !`Data Series`,
-               names_to = "Period",
-               values_to = "Export")
-```
-
-change thousands to millions to standardize the comparison?
-
-```{r}
-merchImportTotalMills <- merchImportTotalThous %>%
+               values_to = "Import") %>%
   mutate("Import Raw" = Import * 1000) %>%
-  mutate("Import" = round(Import / 1000000, digits = 0))
-
-merchExportTotalMills <- merchExportTotalThous %>%
-  mutate("Export Raw" = Export * 1000) %>%
-  mutate("Export" = round(Export / 1000000, digits = 0))
-```
-
-rename the data series for the data frame with totals
-
-```{r}
-merchImportTotalMills <- merchImportTotalMills %>%
+  mutate("Import" = round(Import / 1000000, digits = 0)) %>%
   select(1:3) %>%
   mutate(`Data Series` = str_replace_all(`Data Series`, " Merchandise Imports \\(Thousand Dollars\\)", ""))
 
-merchExportTotalMills <- merchExportTotalMills %>%
+```
+
+load the EXPORT datasets
+ignore the top and bottom rows
+exclude columns which are not in this range: **January 2020 to December 2022**
+convert all rows which are in the millions format to be in the thousands format, 
+or split these rows into another data frame
+pivot the values for the date range: covert to one column to contain the month year, and one column to contain the amount in thousands
+change thousands to millions to standardize the comparison
+
+```{r}
+merchExportRaw <- read_excel("outputFile.xlsx", sheet = "T2", skip = 9)
+
+merchExport <- slice(merchExportRaw, 2:(n() - 23)) %>%
+  select(1, 3:38)
+
+merchExportMills <- slice(merchExport, 1:6) %>%
+  pivot_longer(cols = !`Data Series`,
+               names_to = "Period",
+               values_to = "Export")
+
+merchExportThous <- slice(merchExport, 7:n()) %>%
+  pivot_longer(cols = !`Data Series`,
+               names_to = "Period",
+               values_to = "Export")
+
+merchExportTotal <- slice(merchExportRaw, 1:1) %>%
+  select(1, 3:38) %>%
+  pivot_longer(cols = !`Data Series`,
+               names_to = "Period",
+               values_to = "Export") %>%
+  mutate("Export Raw" = Export * 1000) %>%
+  mutate("Export" = round(Export / 1000000, digits = 0)) %>%
   select(1:3) %>%
   mutate(`Data Series` = str_replace_all(`Data Series`, " Merchandise Exports \\(Thousand Dollars\\)", ""))
+
 ```
 
 merge the import and export columns into one data frame
+pivot the import and export columns
+split the period column into a year and month column
+sort the data frame by data series and period
+remove the text millions and thousands from the data frame
+
 
 ```{r}
 merchMills <- merge(merchImportMills,
                     merchExportMills,
-                    by = c("Data Series", "Period"))
+                    by = c("Data Series", "Period")) %>%
+  pivot_longer(cols = c(`Import`, `Export`),
+               names_to = "Type",
+               values_to = "Amount (M)") %>%
+  mutate(Date = as.Date(paste(Period, "01"), "%Y %B %d")) %>%
+  arrange(`Data Series`, `Date`) %>%
+  mutate(`Data Series` = str_replace_all(`Data Series`, " \\(Million Dollars\\)", "")) %>%
+  mutate(Year = as.character(Date, format = '%y')) %>%
+  mutate(Month = as.character(Date, format = '%b'))
 
 merchThous <- merge(merchImportThous,
                     merchExportThous,
-                    by = c("Data Series", "Period"))
-
-merchTotalMills <- merge(merchImportTotalMills,
-                    merchExportTotalMills,
-                    by = c("Data Series", "Period"))
-```
-
-pivot the import and export columns
-
-```{r}
-merchMills <- merchMills %>%
+                    by = c("Data Series", "Period")) %>%
   pivot_longer(cols = c(`Import`, `Export`),
                names_to = "Type",
-               values_to = "Amount (M)")
+               values_to = "Amount (K)") %>%
+  mutate(Date = as.Date(paste(Period, "01"), "%Y %B %d")) %>%
+  arrange(`Data Series`, `Date`) %>%
+  mutate(`Data Series` = str_replace_all(`Data Series`, " \\(Thousand Dollars\\)", "")) %>%
+  mutate(Year = as.character(Date, format = '%y')) %>%
+  mutate(Month = as.character(Date, format = '%b'))
 
-merchThous <- merchThous %>%
+merchTotalMills <- merge(merchImportTotal,
+                    merchExportTotal,
+                    by = c("Data Series", "Period")) %>%
   pivot_longer(cols = c(`Import`, `Export`),
                names_to = "Type",
-               values_to = "Amount (K)")
+               values_to = "Amount (M)") %>%
+  mutate(Date = as.Date(paste(Period, "01"), "%Y %B %d")) %>%
+  arrange(`Data Series`, `Date`) %>%
+  mutate(Year = as.character(Date, format = '%y')) %>%
+  mutate(Month = as.character(Date, format = '%b'))
 
-merchTotalMills <- merchTotalMills %>%
-  pivot_longer(cols = c(`Import`, `Export`),
-               names_to = "Type",
-               values_to = "Amount (M)")
+
 ```
 
-split the period column into a year and month column
+Split datasets into import and export to be used as and when necessary
 
 ```{r}
-merchMills <- merchMills %>%
-  mutate(Date = as.Date(paste(Period, "01"),
-                        "%Y %B %d"))
+merchMillsImport <- subset(merchMills, Type == "Import") %>%
+  mutate(NewYear = year(Date))
 
-merchThous <- merchThous %>%
-  mutate(Date = as.Date(paste(Period, "01"),
-                        "%Y %B %d"))
+merchMillsExport <- subset(merchMills, Type == "Export") %>%
+  mutate(NewYear = year(Date))
 
-merchTotalMills <- merchTotalMills %>%
-  mutate(Date = as.Date(paste(Period, "01"),
-                        "%Y %B %d"))
-```
-
-sort the data frame by data series and period
-
-```{r}
-merchMills <- merchMills %>%
-  arrange(`Data Series`, `Date`)
-
-merchThous <- merchThous %>%
-  arrange(`Data Series`, `Date`)
-
-merchTotalMills <- merchTotalMills %>%
-  arrange(`Data Series`, `Date`)
-```
-
-remove the text millions and thousands from the data frame
-
-```{r}
-merchMills <- merchMills %>%
-  mutate(`Data Series` = str_replace_all(`Data Series`, " \\(Million Dollars\\)", ""))
-
-merchThous <- merchThous %>%
-  mutate(`Data Series` = str_replace_all(`Data Series`, " \\(Thousand Dollars\\)", ""))
+merchTotalMillsImport <- subset(merchTotalMills, Type == "Import")
+merchTotalMillsExport <- subset(merchTotalMills, Type == "Export")
 ```
 
 The dataset is ready for visualization
 
 ```{r}
+#| code-fold: false
 head(merchMills)
 head(merchThous)
 head(merchTotalMills)
+```
+
+Additional datasets:
+
+```{r}
+#| code-fold: false
+head(merchMillsImport)
+head(merchMillsExport)
+head(merchTotalMillsImport)
+head(merchTotalMillsExport)
 ```
 
 # Data Exploration & Visualization
 
 Time-series data visualization Methods
 
-Classic Line Graph (Overall)
+## Classic Line Graph 
+
+Overall 
 
 ```{r}
 fig1 <- ggplot(data = merchTotalMills,
@@ -245,7 +203,7 @@ fig1 <- ggplot(data = merchTotalMills,
 ggplotly(fig1)
 ```
 
-Classic Line Graph by Region
+By Region
 
 ```{r}
 fig2 <- ggplot(data = merchMills,
@@ -260,7 +218,7 @@ fig2 <- ggplot(data = merchMills,
 ggplotly(fig2)
 ```
 
-Classic Line Graph by Country
+By Country
 
 ```{r}
 fig3 <- ggplot(data = merchThous,
@@ -275,13 +233,9 @@ fig3 <- ggplot(data = merchThous,
 ggplotly(fig3)
 ```
 
-Cycle plot for overall trend of imports and exports
+Overall Trend
 
 ```{r}
-merchTotalMills <- merchTotalMills %>%
-  mutate(Year = as.character(Date, format = '%y')) %>%
-  mutate(Month = as.character(Date, format = '%b'))
-
 groupedData <- merchTotalMills %>%
   group_by(Month) %>%
   summarise(avgValue = mean(`Amount (M)`))
@@ -304,15 +258,6 @@ fig4 <- ggplot() +
 ggplotly(fig4)
 ```
 
-Ridgeline plot
-
-```{r}
-merchTotalMillsImport <- subset(merchTotalMills, Type == "Import")
-merchTotalMillsExport <- subset(merchTotalMills, Type == "Export")
-
-merchTotalMillsImport
-merchTotalMillsExport
-```
 ## Ridgeline
 
 :::: panel-tabset
@@ -358,11 +303,6 @@ ggplot(data = merchTotalMillsExport,
 ### Import
 
 ```{r}
-merchMillsImport <- subset(merchMills, Type == "Import")
-
-merchMillsImport <- merchMillsImport %>%
-  mutate(NewYear = year(Date))
-
 ggplot(data = merchMillsImport,
        aes(x = `Amount (M)`,
            y = `Data Series`,
@@ -381,11 +321,6 @@ ggplot(data = merchMillsImport,
 ### Export
 
 ```{r}
-merchMillsExport <- subset(merchMills, Type == "Export")
-
-merchMillsExport <- merchMillsExport %>%
-  mutate(NewYear = year(Date))
-
 ggplot(data = merchMillsExport,
        aes(x = `Amount (M)`,
            y = `Data Series`,
@@ -405,8 +340,16 @@ ggplot(data = merchMillsExport,
 
 ## Control chart 
 
-Slopegraph
-Horizon graph 
+xx
+
+## Slopegraph
+
+xx
+
+
+## Horizon graph 
+
+xx
 
 ## Sunburst Diagrams
 
@@ -434,15 +377,25 @@ hierCountry <- merchThous %>%
 
 treeCountry <- d3_nest(hierCountry, value_cols = "totalAmount")
 
-sund2b(data = treeCountry,
-       valueField = "totalAmount")
+sunburst(data = treeCountry,
+         valueField = "totalAmount",
+         height = 400,
+         width = "100%",
+         legend = FALSE)
 ```
 
 :::
 
 ## Calendar 
 
-Heatmap 
-Stream Graph
+xx
+
+## Heatmap 
 
 xx
+
+## Stream Graph
+
+xx
+
+This concludes the work submitted for Take-Home Exercise 4. Thank you!
