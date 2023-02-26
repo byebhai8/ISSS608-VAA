@@ -13,476 +13,565 @@ editor: visual
 
 The following is my submission for Take-Home Exercise 4.
 
-# Task
+# 1. Task
 
-xx
+In this take-home exercise, we are required to uncover the impact of COVID-19 as well as the global economic and political dynamic in 2022 on Singapore bi-lateral trade (i.e. Import, Export and Trade Balance) by using appropriate analytical visualization techniques learned in Lesson 6: It's About Time. We are encouraged to apply appropriate interactive techniques to enhance user and data discovery experiences.
 
-# Installing & Launching R Packages
+# 2. Dataset
 
-load the libraries
+### 2.1 Data Source
+
+For the purpose of this take-home exercise, Merchandise Trade provided by Department of Statistics, Singapore (DOS) will be used. The data was available under the sub-section of Merchandise Trade by Region/Market in the following link: <https://www.singstat.gov.sg/find-data/search-by-theme/trade-and-investment/merchandise-trade/latest-data>
+
+The study period for this take-home exercise is between **January 2020** to **December 2022**.
+
+### 2.2 Data Preparation
+
+First, let's load the libraries that we will be using:
 
 ```{r}
-pacman::p_load(ggplot2, plotly, ggridges, gganimate, sunburstR, d3r, lubridate, readxl, tidyverse)
+pacman::p_load(ggplot2, plotly, ggridges, gganimate, sunburstR, d3r, CGPfunctions, ggHoriPlot, streamgraph, timetk, lubridate, readxl, tidyverse)
 ```
 
-# Dataset
-
-### Data Source
-
-xx
-
-### Data Preparation
-
-load the IMPORT datasets
-ignore the top and bottom rows
-exclude columns which are not in this range: **January 2020 to December 2022**
-convert all rows which are in the millions format to be in the thousands format, 
-or split these rows into another data frame
-pivot the values for the date range: covert to one column to contain the month year, and one column to contain the amount in thousands
-change thousands to millions to standardize the comparison
+Let's also load the datasets that we will be using. We will be excluding the top few rows when loading the dataset:
 
 ```{r}
 merchImportRaw <- read_excel("outputFile.xlsx", sheet = "T1", skip = 9)
+merchExportRaw <- read_excel("outputFile.xlsx", sheet = "T2", skip = 9)
+```
 
-merchImport <- slice(merchImportRaw, 2:(n() - 23)) %>%
-  select(1, 3:38)
+The following data preparation steps were executed:
+
+-   Ignore the bottom few rows of the dataset
+
+-   Keep necessary columns for data manipulation
+
+-   Only keep data which falls within the range of **January 2020** to **December 2022**
+
+-   Split the data into three sets, which are grouped by Total, Regions & Country
+
+-   Pivot date and amount values
+
+-   Convert month-year into a date format
+
+```{r}
+merchImport <- slice(merchImportRaw, 2:(n() - 23)) %>% select(1, 3:38)
 
 merchImportMills <- slice(merchImport, 1:6) %>%
-  pivot_longer(cols = !`Data Series`,
-               names_to = "Period",
-               values_to = "Import")
+  pivot_longer(cols = !`Data Series`, names_to = "Period", values_to = "Import")
+
+colnames(merchImportMills)[1] <- "Region"
 
 merchImportThous <- slice(merchImport, 7:n()) %>%
-  pivot_longer(cols = !`Data Series`,
-               names_to = "Period",
-               values_to = "Import")
+  pivot_longer(cols = !`Data Series`, names_to = "Period", values_to = "Import")
+
+colnames(merchImportThous)[1] <- "Country"
 
 merchImportTotal <- slice(merchImportRaw, 1:1) %>%
   select(1, 3:38) %>%
-  pivot_longer(cols = !`Data Series`,
-               names_to = "Period",
-               values_to = "Import") %>%
+  pivot_longer(cols = !`Data Series`, names_to = "Period", values_to = "Import") %>%
   mutate("Import Raw" = Import * 1000) %>%
   mutate("Import" = round(Import / 1000000, digits = 0)) %>%
   select(1:3) %>%
   mutate(`Data Series` = str_replace_all(`Data Series`, " Merchandise Imports \\(Thousand Dollars\\)", ""))
 
-```
+colnames(merchImportTotal)[1] <- "Data"
 
-load the EXPORT datasets
-ignore the top and bottom rows
-exclude columns which are not in this range: **January 2020 to December 2022**
-convert all rows which are in the millions format to be in the thousands format, 
-or split these rows into another data frame
-pivot the values for the date range: covert to one column to contain the month year, and one column to contain the amount in thousands
-change thousands to millions to standardize the comparison
-
-```{r}
-merchExportRaw <- read_excel("outputFile.xlsx", sheet = "T2", skip = 9)
-
-merchExport <- slice(merchExportRaw, 2:(n() - 23)) %>%
-  select(1, 3:38)
+merchExport <- slice(merchExportRaw, 2:(n() - 23)) %>% select(1, 3:38)
 
 merchExportMills <- slice(merchExport, 1:6) %>%
-  pivot_longer(cols = !`Data Series`,
-               names_to = "Period",
-               values_to = "Export")
+  pivot_longer(cols = !`Data Series`, names_to = "Period", values_to = "Export")
+
+colnames(merchExportMills)[1] <- "Region"
 
 merchExportThous <- slice(merchExport, 7:n()) %>%
-  pivot_longer(cols = !`Data Series`,
-               names_to = "Period",
-               values_to = "Export")
+  pivot_longer(cols = !`Data Series`, names_to = "Period", values_to = "Export")
+
+colnames(merchExportThous)[1] <- "Country"
 
 merchExportTotal <- slice(merchExportRaw, 1:1) %>%
   select(1, 3:38) %>%
-  pivot_longer(cols = !`Data Series`,
-               names_to = "Period",
-               values_to = "Export") %>%
+  pivot_longer(cols = !`Data Series`, names_to = "Period", values_to = "Export") %>%
   mutate("Export Raw" = Export * 1000) %>%
   mutate("Export" = round(Export / 1000000, digits = 0)) %>%
   select(1:3) %>%
   mutate(`Data Series` = str_replace_all(`Data Series`, " Merchandise Exports \\(Thousand Dollars\\)", ""))
 
+colnames(merchExportTotal)[1] <- "Data"
 ```
 
-merge the import and export columns into one data frame
-pivot the import and export columns
-split the period column into a year and month column
-sort the data frame by data series and period
-remove the text millions and thousands from the data frame
+Additionally, we will also perform the following steps:
 
+-   Merge the import and export dataframes into a single dataframe
+
+-   Pivot the columns to show the type of amount (either import or export)
+
+-   Remove unnecessary text from the first column
 
 ```{r}
-merchMills <- merge(merchImportMills,
-                    merchExportMills,
-                    by = c("Data Series", "Period")) %>%
-  pivot_longer(cols = c(`Import`, `Export`),
-               names_to = "Type",
-               values_to = "Amount (M)") %>%
+merchMills <- merge(merchImportMills, merchExportMills, by = c("Region", "Period")) %>%
+  pivot_longer(cols = c(`Import`, `Export`), names_to = "Type", values_to = "Amount") %>%
   mutate(Date = as.Date(paste(Period, "01"), "%Y %B %d")) %>%
-  arrange(`Data Series`, `Date`) %>%
-  mutate(`Data Series` = str_replace_all(`Data Series`, " \\(Million Dollars\\)", "")) %>%
-  mutate(Year = as.character(Date, format = '%y')) %>%
-  mutate(Month = as.character(Date, format = '%b'))
+  arrange(`Region`, `Date`) %>%
+  mutate(`Region` = str_replace_all(`Region`, " \\(Million Dollars\\)", "")) %>%
+  mutate(Year = year(Date)) %>%
+  mutate(Month = month(Date))
 
-merchThous <- merge(merchImportThous,
-                    merchExportThous,
-                    by = c("Data Series", "Period")) %>%
-  pivot_longer(cols = c(`Import`, `Export`),
-               names_to = "Type",
-               values_to = "Amount (K)") %>%
+merchThous <- merge(merchImportThous, merchExportThous, by = c("Country", "Period")) %>%
+  pivot_longer(cols = c(`Import`, `Export`), names_to = "Type", values_to = "Amount") %>%
   mutate(Date = as.Date(paste(Period, "01"), "%Y %B %d")) %>%
-  arrange(`Data Series`, `Date`) %>%
-  mutate(`Data Series` = str_replace_all(`Data Series`, " \\(Thousand Dollars\\)", "")) %>%
-  mutate(Year = as.character(Date, format = '%y')) %>%
-  mutate(Month = as.character(Date, format = '%b'))
+  arrange(`Country`, `Date`) %>%
+  mutate(`Country` = str_replace_all(`Country`, " \\(Thousand Dollars\\)", "")) %>%
+  mutate(Year = year(Date)) %>%
+  mutate(Month = month(Date))
 
-merchTotalMills <- merge(merchImportTotal,
-                    merchExportTotal,
-                    by = c("Data Series", "Period")) %>%
-  pivot_longer(cols = c(`Import`, `Export`),
-               names_to = "Type",
-               values_to = "Amount (M)") %>%
+merchTotalMills <- merge(merchImportTotal, merchExportTotal, by = c("Data", "Period")) %>%
+  pivot_longer(cols = c(`Import`, `Export`), names_to = "Type", values_to = "Amount") %>%
   mutate(Date = as.Date(paste(Period, "01"), "%Y %B %d")) %>%
-  arrange(`Data Series`, `Date`) %>%
-  mutate(Year = as.character(Date, format = '%y')) %>%
-  mutate(Month = as.character(Date, format = '%b'))
-
-
+  arrange(`Data`, `Date`) %>%
+  mutate(Year = year(Date)) %>%
+  mutate(Month = month(Date)) %>%
+  mutate(Month2 = as.character(Date, format = '%b'))
 ```
 
-Split datasets into import and export to be used as and when necessary
+Last but not least, we will split the merged dataframes into import and export dataframes to be used as and when necessary:
 
 ```{r}
-merchMillsImport <- subset(merchMills, Type == "Import") %>%
-  mutate(NewYear = year(Date))
-
-merchMillsExport <- subset(merchMills, Type == "Export") %>%
-  mutate(NewYear = year(Date))
-
+merchThousImport <- subset(merchThous, Type == "Import")
+merchThousExport <- subset(merchThous, Type == "Export")
+merchMillsImport <- subset(merchMills, Type == "Import")
+merchMillsExport <- subset(merchMills, Type == "Export")
 merchTotalMillsImport <- subset(merchTotalMills, Type == "Import")
 merchTotalMillsExport <- subset(merchTotalMills, Type == "Export")
 ```
 
-The dataset is ready for visualization
+The datasets are now ready for visualization!
 
-```{r}
-#| code-fold: false
-head(merchMills)
-head(merchThous)
-head(merchTotalMills)
-```
-
-Additional datasets:
-
-```{r}
-#| code-fold: false
-head(merchMillsImport)
-head(merchMillsExport)
-head(merchTotalMillsImport)
-head(merchTotalMillsExport)
-```
-
-# Data Exploration & Visualization
+# 3. Data Exploration & Visualization
 
 Time-series data visualization Methods
 
-## Classic Line Graph 
+### 3.1 Classic Line Graphs
 
-Overall 
+The classic line graphs basically plots a value over time with the intention of discovering the trend of the specified value.
+
+::: panel-tabset
+#### Overall Imports & Exports
 
 ```{r}
-fig1 <- ggplot(data = merchTotalMills,
-       aes(x = Date,
-           y = `Amount (M)`)) +
+fig1 <- ggplot(data = merchTotalMills, aes(x = Date, y = Amount)) +
   geom_line(aes(colour = Type)) +
-  labs(title = "Trend of Import/Export, 2020 to 2022") +
+  labs(x = "Date", y = "Amount", title = "Overall Trend of Imports & Exports, 2020 to 2022") +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5))
 
 ggplotly(fig1)
 ```
 
-By Region
+#### Imports & Exports By Region
 
 ```{r}
-fig2 <- ggplot(data = merchMills,
-       aes(x = Date,
-           y = `Amount (M)`)) +
+fig2 <- ggplot(data = merchMills, aes(x = Date, y = Amount)) +
   geom_line(aes(colour = Type)) +
-  labs(title = "Trend of Import/Export by Region, 2020 to 2022") +
-  facet_wrap(~ `Data Series`) +
+  labs(x = "Date", y = "Amount", title = "Imports & Exports by Region, 2020 to 2022") +
+  facet_wrap(~ Region) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5))
 
 ggplotly(fig2)
 ```
 
-By Country
+#### Imports & Exports by Country
 
 ```{r}
-fig3 <- ggplot(data = merchThous,
-       aes(x = Date,
-           y = `Amount (K)`)) +
-  geom_line(aes(colour = `Data Series`)) +
-  labs(title = "Trend of Import/Export by Country, 2020 to 2022") +
+fig3 <- ggplot(data = merchThous, aes(x = Date, y = Amount)) +
+  geom_line(aes(colour = Country)) +
+  labs(x = "Date", y = "Amount", title = "Imports & Exports by Country, 2020 to 2022") +
   facet_wrap(~ Type) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5))
 
 ggplotly(fig3)
 ```
+:::
 
-Overall Trend
+The overall trend clearly shows an increase in imports and exports over time, although there seems to be a bit of a dip towards the end of 2022. When looking at the imports and exports by region, it is clear that the region of Asia is the main contributor in terms of both imports and exports. When analyzing imports and exports by countries, we can identify the following countries to be the main contributors in terms of imports and exports: Mainland China, Hong Kong, Malaysia, United States and Indonesia.
+
+### 3.2 Cycle Plot
+
+A cycle plot intends to study the behavior of a variable over a seasonal time series.
 
 ```{r}
 groupedData <- merchTotalMills %>%
-  group_by(Month) %>%
-  summarise(avgValue = mean(`Amount (M)`))
+  group_by(Month2) %>%
+  summarise(avgValue = mean(Amount))
 
 fig4 <- ggplot() +
   geom_line(data = merchTotalMills,
-            aes(x = Year,
-                y = `Amount (M)`,
-                group = Month,
+            aes(x = as.character(Date, format = '%y'),
+                y = Amount,
+                group = Month2,
                 colour = Type)) +
   geom_hline(aes(yintercept = avgValue),
              data = groupedData,
              colour = "black",
              size = 0.1) +
-  labs(title = "Cycle Plot showing trend of Imports & Exports by month and by year, 2020 to 2022") +
-  facet_grid(~ factor(Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))) +
+  labs(x = "Date", y = "Amount", title = "Overall Trend of Imports & Exports by month and year, 2020 to 2022") +
+  facet_grid(~ factor(Month2, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5))
 
 ggplotly(fig4)
 ```
 
-## Ridgeline
+With the cycle plot, we can see a steady increase in both imports and export for the months of Mar to Sep. However, there has been a noticeable dip in both imports and exports for the months of Nov and Dec in the year 2022.
 
-:::: panel-tabset
+### 3.3 Plotting Time Series
 
-### Import
+Similar to the classic line graphs, the time series plots aim to identify the trend of a value over time.
 
-```{r}
-ggplot(data = merchTotalMillsImport,
-               aes(x = `Amount (M)`,
-                   y = factor(Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")),
-                   fill = stat(x))) +
-  geom_density_ridges_gradient(scale = 3,
-                               rel_min_height = 0.01) +
-  scale_fill_viridis_c(name = "Amount (M)",
-                       option = "C") +
-  labs(title = "Ridgeline Plot showing trend of Imports by month, 2020 to 2022") +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5))
-```
-
-### Export
+::: panel-tabset
+#### Overall Imports & Exports
 
 ```{r}
-ggplot(data = merchTotalMillsExport,
-       aes(x = `Amount (M)`,
-           y = factor(Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")),
-           fill = stat(x))) +
-  geom_density_ridges_gradient(scale = 3,
-                               rel_min_height = 0.01) +
-  scale_fill_viridis_c(name = "Amount (M)",
-                       option = "C") +
-  labs(title = "Ridgeline Plot showing trend of Exports by month, 2020 to 2022") +
-  theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) 
+merchTotalMills %>%
+  group_by(Type) %>%
+  plot_time_series(Date, Amount, .facet_ncol = 3, .facet_scales = "free", .interactive = TRUE)
 ```
 
+#### Imports by Region
+
+```{r}
+merchMillsImport %>%
+  group_by(Region) %>%
+  plot_time_series(Date, Amount, .facet_ncol = 3, .facet_scales = "free", .interactive = TRUE)
+
+```
+
+#### Exports by Region
+
+```{r}
+merchMillsExport %>%
+  group_by(Region) %>%
+  plot_time_series(Date, Amount, .facet_ncol = 3, .facet_scales = "free", .interactive = TRUE)
+```
 :::
 
-## Ridgline by Regions
+Overall, there seemed to be an increase in imports and exports, except till the end of 2022 where there is a slight dip in both imports and exports. When analyzing the imports by region, Africa seems to be in a clear decline as when compared to other regions. However, when looking at exports by region, Africa seems to have a continuous increase till the end of 2022 as the other regions seemed to have dipped towards the end of 2022.
 
-:::: panel-tabset
+### 3.4 Ridgeline Plots
 
-### Import
+The ridgeline plots allows us to study the distribution of a numeric variable for several groups, such as by Region or by Country.
+
+::: panel-tabset
+#### Overall Imports & Exports
 
 ```{r}
-ggplot(data = merchMillsImport,
-       aes(x = `Amount (M)`,
-           y = `Data Series`,
-           fill = stat(x))) +
-  geom_density_ridges_gradient(scale = 3,
-                               rel_min_height = 0.01) +
-  scale_fill_viridis_c(name = "Amount (M)",
-                       option = "C") +
-  labs(title = "Ridgeline Plot showing trend of Imports by Region, 2020 to 2022") +
+ggplot(data = merchTotalMills, aes(x = Amount, y = Type, fill = after_stat(x))) +
+  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Amount (M)", option = "C") +
+  labs(x = "Amount", y = "Type",
+       title = "Overall Trend of Imports & Exports",
+       subtitle = "2020 to 2022",
+       caption = "Source: Department of Statistics, Singapore") +
   theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  transition_time(NewYear) +
+  theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5)) +
+  transition_time(Year) +
   ease_aes('linear')
 ```
 
-### Export
+#### Imports by Region
 
 ```{r}
-ggplot(data = merchMillsExport,
-       aes(x = `Amount (M)`,
-           y = `Data Series`,
-           fill = stat(x))) +
-  geom_density_ridges_gradient(scale = 3,
-                               rel_min_height = 0.01) +
-  scale_fill_viridis_c(name = "Amount (M)",
-                       option = "C") +
-  labs(title = "Ridgeline Plot showing trend of Imports by Region, 2020 to 2022") +
+ggplot(data = merchMillsImport, aes(x = Amount, y = Region, fill = after_stat(x))) +
+  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Amount (M)", option = "C") +
+  labs(x = "Amount", y = "Region",
+       title = "Trend of Imports by Region",
+       subtitle = "2020 to 2022",
+       caption = "Source: Department of Statistics, Singapore") +
   theme_bw() +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  transition_time(NewYear) +
+  theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5)) +
+  transition_time(Year) +
   ease_aes('linear')
 ```
 
-:::
-
-## Control chart 
-
-xx
-
-## Slopegraphs
-
-:::: panel-tabset
-
-### Import By Region
+#### Exports by Region
 
 ```{r}
-merchMillsImport <- merchMillsImport %>%
-  mutate(Year = as.character(Date, format = '%Y'))
-
-tmp2020import <- merchMillsImport %>% filter(Year == 2020)
-tmp2022import <- merchMillsImport %>% filter(Year == 2022)
-
-importAmount2020 <- tmp2020import$`Amount (M)`
-importAmount2022 <- tmp2022import$`Amount (M)`
-group <- tmp2020import$`Data Series`
-years <- 3
-
-a <- data.frame(importAmount2020, importAmount2022, group)
-a <- a %>%
-  group_by(group) %>%
-  summarise(total2020 = sum(importAmount2020), total2022 = sum(importAmount2022))
-
-lab2020 <- paste(a$group, round(a$total2020), sep = ", ")
-lab2022 <- paste(a$group, round(a$total2022), sep = ", ")
-
-fig6 <- ggplot(a) +
-  geom_segment(aes(x = 0, xend = years, y = total2020, yend = total2022), size = 0.5) +
-  ggtitle("Imports by Region") +
-  geom_text(label = lab2020, y = a$total2020, x = -0.5, hjust = 1, vjust = 0.5, size = 2) +
-  geom_text(label = lab2022, y = a$total2022, x = 3.5, hjust = 0, vjust = 0.5, size = 2) +
-  geom_text(label = "2020", x = 0, y = (1.03 * max(a$total2020, a$total2022)), hjust = 0.2, size = 3) +
-  geom_text(label = "2022", x = years, y = (1.03 * max(a$total2020, a$total2022)), hjust = 0, size = 3) +
-  xlim(-1, (years + 1)) +
-  ylim(min(a$total2020, a$total2022) -50, max(a$total2020, a$total2022) + 50) +
-  xlab("") +
-  ylab("") +
+ggplot(data = merchMillsExport, aes(x = Amount, y = Region, fill = after_stat(x))) +
+  geom_density_ridges_gradient(scale = 3, rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Amount (M)", option = "C") +
+  labs(x = "Amount", y = "Region",
+       title = "Trend of Exports by Region",
+       subtitle = "2020 to 2022",
+       caption = "Source: Department of Statistics, Singapore") +
   theme_bw() +
-  theme(panel.background = element_blank(),
-        panel.grid = element_blank(),
-        axis.ticks = element_blank(),
-        axis.text = element_blank(),
-        panel.border = element_blank())
-
-ggplotly(fig6)
+  theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5)) +
+  transition_time(Year) +
+  ease_aes('linear')
 ```
-
-### Export By Region
-
-```{r}
-merchMillsExport <- merchMillsExport %>%
-  mutate(Year = as.character(Date, format = '%Y'))
-
-tmp2020export <- merchMillsExport %>% filter(Year == 2020)
-tmp2022export <- merchMillsExport %>% filter(Year == 2022)
-
-exportAmount2020 <- tmp2020export$`Amount (M)`
-exportAmount2022 <- tmp2022export$`Amount (M)`
-group <- tmp2020export$`Data Series`
-years <- 3
-
-b <- data.frame(exportAmount2020, exportAmount2022, group)
-b <- b %>%
-  group_by(group) %>%
-  summarise(total2020 = sum(exportAmount2020), total2022 = sum(exportAmount2022))
-
-lab2020 <- paste(b$group, round(b$total2020), sep = ", ")
-lab2022 <- paste(b$group, round(b$total2022), sep = ", ")
-
-fig7 <- ggplot(b) +
-  geom_segment(aes(x = 0, xend = years, y = total2020, yend = total2022), size = 0.5) +
-  ggtitle("Exports by Region") +
-  geom_text(label = lab2020, y = b$total2020, x = -0.5, hjust = 1, vjust = 0.5, size = 2) +
-  geom_text(label = lab2022, y = b$total2022, x = 3.5, hjust = 0, vjust = 0.5, size = 2) +
-  geom_text(label = "2020", x = 0, y = (1.03 * max(b$total2020, b$total2022)), hjust = 0.2, size = 3) +
-  geom_text(label = "2022", x = years, y = (1.03 * max(b$total2020, b$total2022)), hjust = 0, size = 3) +
-  xlim(-1, (years + 1)) +
-  ylim(min(b$total2020, b$total2022) -50, max(b$total2020, b$total2022) + 50) +
-  xlab("") +
-  ylab("") +
-  theme_bw() +
-  theme(panel.background = element_blank(),
-        panel.grid = element_blank(),
-        axis.ticks = element_blank(),
-        axis.text = element_blank(),
-        panel.border = element_blank())
-
-ggplotly(fig7)
-```
-
 :::
 
-xxx
+With this ridgeline plot and animation, we can see the clear shift in distribution between the overall import and exports from the year 2020 to 2022. Moreover, we can also view how Asia has dominated other regions in terms of both imports and exports.
 
-## Horizon graph 
+### 3.5 Slope Graphs
 
-xx
+Slope graphs aim to compare the changes over time for a list of values on an ordinal or interval scale. When we use slope graphs, we want to show if the value in the first column is higher, lower or remains as the same value in the second column. The change between these two columns are easy to see when we connect those values with lines, as the lines will either slope up or down, in the direction of the change. The steeper the slope, the bigger the change.
 
-## Sunburst Diagrams
+::: panel-tabset
+#### Overall Imports & Exports
 
-:::: panel-tabset
+```{r}
+merchTotalMills %>%
+  group_by(Type, Year) %>%
+  summarise(Amount = sum(Amount)) %>%
+  mutate(Year = factor(Year)) %>%
+  filter(Year %in% c(2020, 2022)) %>%
+  newggslopegraph(Year, Amount, Type,
+                  Title = "Overall Imports & Exports",
+                  SubTitle = "2020 to 2022",
+                  Caption = "Source: Department of Statistics, Singapore")
+```
 
-### By Region
+#### Imports by Region
+
+```{r}
+merchMillsImport %>%
+  group_by(Region, Year) %>%
+  summarise(Amount = sum(Amount)) %>%
+  mutate(Year = factor(Year)) %>%
+  filter(Year %in% c(2020, 2022)) %>%
+  newggslopegraph(Year, Amount, Region,
+                  Title = "Imports by Region",
+                  SubTitle = "2020 to 2022",
+                  Caption = "Source: Department of Statistics, Singapore")
+```
+
+#### Exports by Region
+
+```{r}
+merchMillsExport %>%
+  group_by(Region, Year) %>%
+  summarise(Amount = sum(Amount)) %>%
+  mutate(Year = factor(Year)) %>%
+  filter(Year %in% c(2020, 2022)) %>%
+  newggslopegraph(Year, Amount, Region,
+                  Title = "Exports by Region",
+                  SubTitle = "2020 to 2022",
+                  Caption = "Source: Department of Statistics, Singapore")
+```
+:::
+
+With the slope graph for overall imports and exports, we can see the steep increase in both between the years of 2020 and 2022. When analyzing the imports by region, only Asia seems to have a steep increase while the other regions did not have much of a change. This is applicable to the exports by regions as well.
+
+### 3.6 Stream Graphs
+
+This is a type of stacked area chart which is displaced around a central axis. Due to this displacement, the graph will resemble a flowing, organic shape.
+
+#### Overall Imports & Exports
+
+```{r}
+merchTotalMills %>%
+  group_by(Date, Type) %>%
+  summarise(Amount = sum(Amount)) %>%
+  streamgraph(key = Type, value = Amount, date = Date) %>%
+  sg_axis_x(Date, tick_interval = 3, tick_format = " %b %y")
+```
+
+#### Imports by Region
+
+```{r}
+merchMillsImport %>%
+  group_by(Date, Region) %>%
+  summarise(Amount = sum(Amount)) %>%
+  streamgraph(key = Region, value = Amount, date = Date) %>%
+  sg_axis_x(Date, tick_interval = 3, tick_format = " %b %y")
+```
+
+#### Exports by Region
+
+```{r}
+merchMillsExport %>%
+  group_by(Date, Region) %>%
+  summarise(Amount = sum(Amount)) %>%
+  streamgraph(key = Region, value = Amount, date = Date) %>%
+  sg_axis_x(Date, tick_interval = 3, tick_format = " %b %y")
+```
+
+#### Imports by Country
+
+```{r}
+merchThousImport %>%
+  group_by(Date, Country) %>%
+  summarise(Amount = sum(Amount)) %>%
+  streamgraph(key = Country, value = Amount, date = Date) %>%
+  sg_axis_x(Date, tick_interval = 3, tick_format = " %b %y")
+```
+
+#### Exports by Country
+
+```{r}
+merchThousExport %>%
+  group_by(Date, Country) %>%
+  summarise(Amount = sum(Amount)) %>%
+  streamgraph(key = Country, value = Amount, date = Date) %>%
+  sg_axis_x(Date, tick_interval = 3, tick_format = " %b %y")
+```
+
+With these stream graphs, we can view the import and export trends by both regions and countries between the year 2020 and 2022.
+
+### 3.7 Horizon Graphs
+
+This is basically an area chart that has been divided into consecutive layers. In this view, we are able to present time-series data in a compact space while preserving the resolution of the visualization.
+
+::: panel-tabset
+#### Overall Imports & Exports
+
+```{r}
+merchTotalMills %>%
+  group_by(Date, Type) %>%
+  summarise(Amount = sum(Amount)) %>%
+  ggplot() +
+  geom_horizon(aes(x = Date, y = Amount), origin = "midpoint", horizonscale = 6) +
+  facet_grid(Type~.) +
+  scale_fill_hcl(palette = "RdBu") +
+  scale_x_date(expand = c(0,0), date_breaks = "3 month", date_labels = " %b %y") +
+  theme_minimal() +
+  theme(panel.spacing.y = unit(0, "lines"), 
+        strip.text.y = element_text(size = 5, angle = 0, hjust = 0),
+        legend.position = 'none',
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 7),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.border = element_blank())
+```
+
+#### Imports by Region
+
+```{r}
+merchMillsImport %>%
+  group_by(Date, Region) %>%
+  summarise(Amount = sum(Amount)) %>%
+  ggplot() +
+  geom_horizon(aes(x = Date, y = Amount), origin = "midpoint", horizonscale = 6) +
+  facet_grid(Region~.) +
+  scale_fill_hcl(palette = "RdBu") +
+  scale_x_date(expand = c(0,0), date_breaks = "3 month", date_labels = " %b %y") +
+  theme_minimal() +
+  theme(panel.spacing.y = unit(0, "lines"), 
+        strip.text.y = element_text(size = 5, angle = 0, hjust = 0),
+        legend.position = 'none',
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 7),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.border = element_blank())
+```
+
+#### Exports by Region
+
+```{r}
+merchMillsExport %>%
+  group_by(Date, Region) %>%
+  summarise(Amount = sum(Amount)) %>%
+  ggplot() +
+  geom_horizon(aes(x = Date, y = Amount), origin = "midpoint", horizonscale = 6) +
+  facet_grid(Region~.) +
+  scale_fill_hcl(palette = "RdBu") +
+  scale_x_date(expand = c(0,0), date_breaks = "3 month", date_labels = " %b %y") +
+  theme_minimal() +
+  theme(panel.spacing.y = unit(0, "lines"), 
+        strip.text.y = element_text(size = 5, angle = 0, hjust = 0),
+        legend.position = 'none',
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 7),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.border = element_blank())
+```
+
+#### Imports by Country
+
+```{r}
+merchThousImport %>%
+  group_by(Date, Country) %>%
+  summarise(Amount = sum(Amount)) %>%
+  ggplot() +
+  geom_horizon(aes(x = Date, y = Amount), origin = "midpoint", horizonscale = 6) +
+  facet_grid(Country~.) +
+  scale_fill_hcl(palette = "RdBu") +
+  scale_x_date(expand = c(0,0), date_breaks = "3 month", date_labels = " %b %y") +
+  theme_minimal() +
+  theme(panel.spacing.y = unit(0, "lines"), 
+        strip.text.y = element_text(size = 5, angle = 0, hjust = 0),
+        legend.position = 'none',
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 7),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.border = element_blank())
+```
+
+#### Exports by Country
+
+```{r}
+merchThousExport %>%
+  group_by(Date, Country) %>%
+  summarise(Amount = sum(Amount)) %>%
+  ggplot() +
+  geom_horizon(aes(x = Date, y = Amount), origin = "midpoint", horizonscale = 6) +
+  facet_grid(Country~.) +
+  scale_fill_hcl(palette = "RdBu") +
+  scale_x_date(expand = c(0,0), date_breaks = "3 month", date_labels = " %b %y") +
+  theme_minimal() +
+  theme(panel.spacing.y = unit(0, "lines"), 
+        strip.text.y = element_text(size = 5, angle = 0, hjust = 0),
+        legend.position = 'none',
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 7),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.border = element_blank())
+```
+:::
+
+Similar to the stream graphs, we can view the import and export trends by both regions and countries between the year 2020 and 2022.
+
+### 3.8 Sunburst Diagrams
+
+These sunburst diagrams help to show a hierarchical view of a dataframe. Each level of the hierarchy will be represented by one ring with the innermost circle as the top/root of the hierarchy. With this, we can illustrate how the underlying data contributes to the higher levels of an hierarchy.
+
+#### Imports & Exports by Region
 
 ```{r}
 hierRegion <- merchMills %>%
-  group_by(Type, `Data Series`) %>%
-  summarize(totalAmount = sum(`Amount (M)`))
+  group_by(Type, Region) %>%
+  summarize(totalAmount = sum(Amount))
 
 treeRegion <- d3_nest(hierRegion, value_cols = "totalAmount")
 
-sund2b(data = treeRegion,
-       valueField = "totalAmount")
+sund2b(data = treeRegion, valueField = "totalAmount")
 ```
 
-### By Country
+#### Imports & Exports by Country
 
 ```{r}
 hierCountry <- merchThous %>%
-  group_by(Type, `Data Series`) %>%
-  summarize(totalAmount = sum(`Amount (K)`))
+  group_by(Type, Country) %>%
+  summarize(totalAmount = sum(Amount))
 
 treeCountry <- d3_nest(hierCountry, value_cols = "totalAmount")
 
-sunburst(data = treeCountry,
-         valueField = "totalAmount",
-         legend = FALSE)
+sunburst(data = treeCountry, valueField = "totalAmount", legend = FALSE)
 ```
 
-:::
-
-## Calendar 
-
-xx
-
-## Heatmap 
-
-xx
-
-## Stream Graph
-
-xx
+In my case, I have transformed the dataframes to represent a hierarchy in order to visualize how certain regions and countries contribute to the total amount of imports and exports. The analysis by regions is built using sund2b which provides both the value and percentages that each region contributes in terms of both imports and exports. On the other hand, the analysis of countries is built using sunburst which only shows the percentages that each country contributes in terms of both imports and exports.
 
 This concludes the work submitted for Take-Home Exercise 4. Thank you!
