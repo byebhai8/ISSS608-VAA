@@ -30,7 +30,7 @@ The study period for this take-home exercise is between **January 2020** to **De
 First, let's load the libraries that we will be using:
 
 ```{r}
-pacman::p_load(ggplot2, plotly, ggridges, gganimate, sunburstR, d3r, CGPfunctions, ggHoriPlot, streamgraph, timetk, lubridate, readxl, tidyverse)
+pacman::p_load(ggplot2, plotly, ggridges, gganimate, CGPfunctions, ggHoriPlot, timetk, lubridate, readxl, tidyverse, d3r)
 ```
 
 Let's also load the datasets that we will be using. We will be excluding the top few rows when loading the dataset:
@@ -369,14 +369,22 @@ With the slope graph for overall imports and exports, we can see the steep incre
 
 This is a type of stacked area chart which is displaced around a central axis. Due to this displacement, the graph will resemble a flowing, organic shape.
 
+```{r}
+devtools::install_github("hrbrmstr/streamgraph")
+```
+
+```{r}
+library(streamgraph)
+```
+
+::: panel-tabset
 #### Overall Imports & Exports
 
 ```{r}
 merchTotalMills %>%
   group_by(Date, Type) %>%
   summarise(Amount = sum(Amount)) %>%
-  streamgraph(key = Type, value = Amount, date = Date) %>%
-  sg_axis_x(Date, tick_interval = 3, tick_format = " %b %y")
+  streamgraph(key = Type, value = Amount, date = Date)
 ```
 
 #### Imports by Region
@@ -385,8 +393,7 @@ merchTotalMills %>%
 merchMillsImport %>%
   group_by(Date, Region) %>%
   summarise(Amount = sum(Amount)) %>%
-  streamgraph(key = Region, value = Amount, date = Date) %>%
-  sg_axis_x(Date, tick_interval = 3, tick_format = " %b %y")
+  streamgraph(key = Region, value = Amount, date = Date)
 ```
 
 #### Exports by Region
@@ -395,8 +402,7 @@ merchMillsImport %>%
 merchMillsExport %>%
   group_by(Date, Region) %>%
   summarise(Amount = sum(Amount)) %>%
-  streamgraph(key = Region, value = Amount, date = Date) %>%
-  sg_axis_x(Date, tick_interval = 3, tick_format = " %b %y")
+  streamgraph(key = Region, value = Amount, date = Date)
 ```
 
 #### Imports by Country
@@ -405,8 +411,7 @@ merchMillsExport %>%
 merchThousImport %>%
   group_by(Date, Country) %>%
   summarise(Amount = sum(Amount)) %>%
-  streamgraph(key = Country, value = Amount, date = Date) %>%
-  sg_axis_x(Date, tick_interval = 3, tick_format = " %b %y")
+  streamgraph(key = Country, value = Amount, date = Date)
 ```
 
 #### Exports by Country
@@ -415,9 +420,9 @@ merchThousImport %>%
 merchThousExport %>%
   group_by(Date, Country) %>%
   summarise(Amount = sum(Amount)) %>%
-  streamgraph(key = Country, value = Amount, date = Date) %>%
-  sg_axis_x(Date, tick_interval = 3, tick_format = " %b %y")
+  streamgraph(key = Country, value = Amount, date = Date)
 ```
+:::
 
 With these stream graphs, we can view the import and export trends by both regions and countries between the year 2020 and 2022.
 
@@ -548,16 +553,21 @@ Similar to the stream graphs, we can view the import and export trends by both r
 
 These sunburst diagrams help to show a hierarchical view of a dataframe. Each level of the hierarchy will be represented by one ring with the innermost circle as the top/root of the hierarchy. With this, we can illustrate how the underlying data contributes to the higher levels of an hierarchy.
 
+```{r}
+library(sunburstR)
+```
+
+::: panel-tabset
 #### Imports & Exports by Region
 
 ```{r}
 hierRegion <- merchMills %>%
   group_by(Type, Region) %>%
-  summarize(totalAmount = sum(Amount))
+  summarize(totalAmount = sum(`Amount`))
 
 treeRegion <- d3_nest(hierRegion, value_cols = "totalAmount")
 
-sund2b(data = treeRegion, valueField = "totalAmount")
+sund2b(data = treeRegion, valueField = "totalAmount", height = 300, width = "100%")
 ```
 
 #### Imports & Exports by Country
@@ -565,12 +575,13 @@ sund2b(data = treeRegion, valueField = "totalAmount")
 ```{r}
 hierCountry <- merchThous %>%
   group_by(Type, Country) %>%
-  summarize(totalAmount = sum(Amount))
+  summarize(totalAmount = sum(`Amount`))
 
 treeCountry <- d3_nest(hierCountry, value_cols = "totalAmount")
 
-sunburst(data = treeCountry, valueField = "totalAmount", legend = FALSE)
+sunburst(data = treeCountry, valueField = "totalAmount", legend = FALSE, height = 300, width = "100%")
 ```
+:::
 
 In my case, I have transformed the dataframes to represent a hierarchy in order to visualize how certain regions and countries contribute to the total amount of imports and exports. The analysis by regions is built using sund2b which provides both the value and percentages that each region contributes in terms of both imports and exports. On the other hand, the analysis of countries is built using sunburst which only shows the percentages that each country contributes in terms of both imports and exports.
 

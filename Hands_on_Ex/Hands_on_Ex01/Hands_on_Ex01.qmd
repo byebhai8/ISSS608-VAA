@@ -11,6 +11,7 @@ date: "14 January 2023"
 This code chunk below uses p_load() of pacman package to check if tidyverse packages are installed in the computer, If they are, then they will be launched into R. Also, this code chunk assumes that we have pacman package installed. If not, install pacman first.
 
 ```{r}
+library(pacman)
 pacman::p_load(tidyverse)
 ```
 
