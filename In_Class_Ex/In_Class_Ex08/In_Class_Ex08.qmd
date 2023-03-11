@@ -1,0 +1,181 @@
+---
+title: "In_Class_Ex_08"
+author: "Bhairavi"
+date: "11 March 2023"
+execute:
+  warning: false
+---
+
+## Installing and launching R packages
+
+We will load the necessary R packages that are required for this exercise:
+
+```{r}
+pacman::p_load(igraph, tidygraph, ggraph, visNetwork, lubridate, clock, tidyverse, graphlayouts)
+```
+
+## Importing Network Data
+
+In this step, we will import the files into R Studio using read_csv() of readr package:
+
+```{r}
+GAStech_nodes <- read_csv("data/GAStech_email_node.csv")
+GAStech_edges <- read_csv("data/GAStech_email_edge-v2.csv")
+```
+
+Once loaded, let's review the data structed of the data fram using glimpse() of dplyr:
+
+```{r}
+glimpse(GAStech_edges)
+```
+
+Take note: the output of the GAStech_edges reveals that SentDate is treated as a Character data type instead of a Date data type. This is actually an error as we need the data types to be accurate.
+
+Let's change the data type using the following code chunk:
+
+```{r}
+GAStech_edges <- GAStech_edges %>%
+  mutate(SentDate = dmy(SentDate)) %>%
+  mutate(Weekday = wday(SentDate, label = TRUE, abbr = FALSE))
+```
+
+Take note:
+
+- both dmy() and wday() are functions of the lubridate package, which is an R package that makes it easier to work with dates and times
+- dmy() transforms the SentDate field into a Date data type
+- wday() returns the day of the week as a decimal number (or an ordered factor if label is set to TRUE), and the argument abbr = FALSE will keep the days spelt in full (e.g., Monday)
+- the values in the Weekday field are in ordinal scale
+
+Let's check how the data structure looks like now:
+
+```{r}
+glimpse(GAStech_edges)
+```
+
+When examining the data frame, it is observable that this data frame consists of individual email flow records. This will not be helpful when building visualizations. As such, let's aggregate the individual records by Date, Senders, Receiver, Main Subject and Day of the Week.
+
+The code chunk does the above:
+
+```{r}
+GAStech_edges_agg <- GAStech_edges %>%
+  filter(MainSubject == "Work related") %>%
+  group_by(source, target, Weekday) %>%
+  summarize(Weight = n()) %>%
+  filter(source != target) %>%
+  filter(Weight > 1) %>%
+  ungroup()
+```
+
+Take note:
+
+- four functions from dplyr package are used: filter(), group(), summarise() and ungroup()
+- a new field called Weight has been added to store the number of emails that were sent between a source and target per weekday
+
+Let's check how the data structure looks like now:
+
+```{r}
+glimpse(GAStech_edges_agg)
+```
+
+## Creating Newtork Objects (tidygraph)
+
+In this section, we will create a graph data model using tidygraph package. This package provides a tidy API for graph/network manipulation.
+
+While network data itself is not tidy, it can be envisioned as two tidy tables - one for node data and one for edge data. With tidygraph, we can switch between the two tables and provide dplyr verbs to manipulate them.
+
+There are two main functions in tidygraph package to create network objects
+
+- tbl_graph() creates a tbl_graph network object from nodes and edges data
+- as_tbl_graph() converts a network data and objects to a tbl_graph network
+
+The following are the dplyr verbs in tidygraph
+
+- activate() verb serves as a switch between tibbles for nodes and edges
+- .N() function can be used to gain access to the node data while manipulating the edge data
+- similarly, .E() function will give you the edge data
+- likewise, .G() function will give you the tbl_graph object itself
+
+All dplyr verbs applied to tbl_graph object are also applied to the active tibble.
+
+The code chunk below is used to build a network graph:
+
+```{r}
+GAStech_graph <- tbl_graph(nodes = GAStech_nodes,
+                           edges = GAStech_edges_agg,
+                           directed = TRUE)
+GAStech_graph
+```
+
+Take note:
+
+- the output reveals that GAStech_graph is a tbl_graph object with 54 nodes and 1456 edges
+- the command also prints the first six rows of the Node data and the first three rows of the Edge data
+- this states that the Node data is active, meaning that we can manipulate the data in the tbl_graph object one tibble at a time
+
+If we want to change which tibble data frame is active, as well as rearrange the rows in the edges tibble to list those with the highest "weight" first, we can use the code chunk below:
+
+```{r}
+GAStech_graph %>%
+  activate(edges) %>%
+  arrange(desc(Weight))
+```
+
+## Plotting Network Data (ggraph)
+
+Let's plot a basic network graph:
+
+```{r}
+ggraph(GAStech_graph) +
+  geom_edge_link() +
+  geom_node_point()
+```
+
+Take note:
+
+- the basic plotting function is ggraph()
+- this takes the data to be used for the graph and the type of layout desired
+- both of the arguents for ggraph() are built around igraph
+- therefore, ggraph() can use either an igraph object or a tbl_graph object
+
+We can also plot the network graph using Fruchterman and Reingold layout:
+
+```{r}
+g <- ggraph(GAStech_graph,
+            layout = "fr") +
+  geom_edge_link(aes()) +
+  geom_node_point(aes())
+
+g + theme_graph()
+```
+
+We can also colour each node by referring to their respective departments:
+
+````{r}
+g <- ggraph(GAStech_graph,
+            layout = "nicely") +
+  geom_edge_link(aes()) +
+  geom_node_point(aes(colour = Department,
+                      size = 3))
+
+g + theme_graph()
+```
+
+## Creating Facet Graphs
+
+In the code chunk below, we use facet_edges():
+
+```{r}
+set_graph_style()
+
+g <- ggraph(GAStech_graph,
+            layout = "nicely") +
+  geom_edge_link(aes(width = Weight),
+                 alpha = 0.2) +
+  scale_edge_width(range = c(0.1, 5)) +
+  geom_node_point(aes(colour = Department),
+                  size = 2)
+
+g + facet_edges(~ Weekday)
+```
+
+xxx
