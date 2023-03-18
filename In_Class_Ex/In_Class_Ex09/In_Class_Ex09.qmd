@@ -1,0 +1,32 @@
+---
+title: "In_Class_Ex_09"
+author: "Bhairavi"
+date: "18 March 2023"
+execute:
+  warning: false
+---
+
+# 1. Getting Started
+
+```{r}
+pacman::p_load(lubridate, ggthemes, reactable, reactablefmtr, gt, gtExtras, tidyverse)
+```
+
+# 2. Importing Microsoft Access Database
+
+```{r}
+# library(RODBC)
+# 
+# con <- odbcConnectAccess('data/Coffee Chain.mdb')
+# coffeechain <- sqlFetch(con, 'CoffeeChain Query')
+# write_rds(coffeechain, "data/CoffeeChain.rds")
+# odbcClose(con)
+```
+
+# 3. Data Preparation
+
+```{r}
+# coffeechain <- read_rds("data/CoffeeChain.rds")
+```
+
+x
